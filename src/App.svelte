@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script context="module">
   import firebase from "firebase/app";
 
 
