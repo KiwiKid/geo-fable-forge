@@ -1,13 +1,16 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
+	//const dispatch = createEventDispatcher();
 	
-	export let count;
+	/**
+	 * @type {any}
+	 */
+	 export let place;
 	
-	function addValue(delta) {
+	/*function addValue(delta) {
 		count += delta;
 		dispatch('change', count);
-	}
+	}*/
 </script>
 
 <style>
@@ -17,14 +20,14 @@
 </style>
 
 <div>
-	<button on:click={() => addValue(-1)}>
+	<!--<button on:click={() => addValue(-1)}>
 		-
 	</button>
 	<button on:click={() => addValue(1)}>
 		+
-	</button>	
+	</button>	-->
 </div>
 
 <div style="width:100%;text-align:center;font-weight:600">
-	{count}
+	{JSON.stringify(place)}WOAH
 </div>

@@ -42,21 +42,21 @@
 	}
 </script>
 
-<div class="counter">
-	<button on:click={decrement} aria-label="Decrease the counter by one">
+<div class="counter">777
+	<button on:click={decrement} aria-label="Decrease the counter by one">YES
 		<svg aria-hidden="true" viewBox="0 0 1 1">
 			<path d="M0,0.5 L1,0.5" />
 		</svg>
 	</button>
 
-	<div class="counter-viewport">
+	<div class="counter-viewport">www
 		<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
-			<strong class="hidden" aria-hidden="true">{Math.floor($displayed_count + 1)}</strong>
+			<strong class="hidden" aria-hidden="true">{Math.floor($displayed_count + 1)}</strong>YES
 			<strong>{Math.floor($displayed_count)}</strong>
 		</div>
 	</div>
 
-	<button on:click={increment} aria-label="Increase the counter by one">
+	<button on:click={increment} aria-label="Increase the counter by one">EEEE
 		<svg aria-hidden="true" viewBox="0 0 1 1">
 			<path d="M0,0.5 L1,0.5 M0.5,0 L0.5,1" />
 		</svg>

@@ -12,10 +12,10 @@
 	import MarkerPopup from '../lib/components/MarkerPopup.svelte';
 	import * as markerIcons from '../lib/components/markers.js';
 
-	let map:LMap;
+	let map:LMap | null;
 
-	const initialView = [39.8283, -98.5795];
-	function createMap(container) {
+	const initialView:[number, number] = [39.8283, -98.5795];
+	function createMap(container:any) {
 	  let m = L.map(container, {preferCanvas: true }).setView(initialView, 5);
     L.tileLayer(
 	    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
@@ -33,9 +33,9 @@
 	let eye = true;
 	let lines = true;
 	
-	let toolbar = L.control({ position: 'topright' });
-	let toolbarComponent;
-	toolbar.onAdd = (map:LMap) => {
+	//let toolbar = new L.Control({ position: 'topright' });
+	let toolbarComponent:any;
+	/*toolbar.onAdd = (map:LMap) => {
 		let div = L.DomUtil.create('div');
 		toolbarComponent = new MapToolbar({
 			target: div,
@@ -44,9 +44,9 @@
 
 		toolbarComponent.$on('click-eye', ({ detail }) => eye = detail);
 		toolbarComponent.$on('click-lines', ({ detail }) => lines = detail);
-		toolbarComponent.$on('click-reset', () => {
-			map.setView(initialView, 5, { animate: true })
-		})
+		//toolbarComponent.$on('click-reset', () => {
+		//	map.setView(initialView, 5, { animate: true })
+		//})
 
 		return div;
 	}
@@ -56,12 +56,12 @@
 			toolbarComponent.$destroy();
 			toolbarComponent = null;
 		}
-	};
+	};*/
 	
 	// Create a popup with a Svelte component inside it and handle removal when the popup is torn down.
 	// `createFn` will be called whenever the popup is being created, and should create and return the component.
-	function bindPopup(marker, createFn) {
-		let popupComponent;
+	function bindPopup(marker:any, createFn:any) {
+		let popupComponent:any;
 		marker.bindPopup(() => {
 			let container = L.DomUtil.create('div');
 			popupComponent = createFn(container);
@@ -83,36 +83,43 @@
 	
 	let markers = new Map();
 	
-	function markerIcon(count) {
-		let html = `<div class="map-marker"><div>${markerIcons.library}</div><div class="marker-text">${count}</div></div>`;
+	function markerIcon(content:string) {
+		let html = `<div class="map-marker"><div>${markerIcons.library}</div><div class="marker-text">${content}</div></div>`;
 		return L.divIcon({
 			html,
 			className: 'map-marker'
 		});
 	}
 	
- /**
-  * 
-  * @param {Object} place
-  * @param {number} place.lat 
-  * @param {number} place.lng
-  */
-	function createMarker(loc) {
-		let count = Math.ceil(Math.random() * 25);
-		let icon = markerIcon(count);
-		let marker = L.marker(loc, {icon});
-		bindPopup(marker, (m) => {
+ interface Place {
+	wikiId:string
+	lat:string
+	lng:string
+	title?:string
+	story?:string
+ }
+	function createMarker(place:Place) {
+		console.log('createMarker')
+		console.log(place)
+		let icon = markerIcon(place.wikiId);
+		let marker = L.marker([+place.lat, +place.lng], {icon});
+		bindPopup(marker, (m:any) => {
+			console.log('bindPopup')
 			let c = new MarkerPopup({
 				target: m,
 				props: {
-					count
+					place
 				}
 			});
+
+/*			c.$on('loading', () => {
+				marker.setIcon(markerIcon('LOADING'))
+			})
 			
-			c.$on('change', ({detail}) => {
-				count = detail;
-				marker.setIcon(markerIcon(count));
-			});
+			c.$on('story-load', ({detail}) => {
+				// TODO: re-trigger load of this story
+				marker.setIcon(markerIcon('LOADED'));
+			});*/
 			
 			return c;
 		});
@@ -129,12 +136,12 @@
 		
 	}
 
-	let markerLayers;
-	let lineLayers;
-  function mapAction(container) {
+	let markerLayers:any;
+	let lineLayers:any
+  function mapAction(container:any) {
 
     map = createMap(container); 
-		toolbar.addTo(map);
+	//toolbar.addTo(map);
 
 
     if(!data.places){
@@ -144,7 +151,8 @@
 
       markerLayers = L.layerGroup()
       for(let place of data.places) {
-        let m = createMarker([place.lat, place.lng]);
+		console.log('for(let place of data.places) {')
+        let m = createMarker(place);
         markerLayers.addLayer(m);
       }
     
@@ -157,8 +165,8 @@
 
     return {
        destroy: () => {
-				 toolbar.remove();
-				 map.remove();
+	//			 toolbar.remove();
+				 map ? map.remove() : null
 				 map = null;
 			 }
     };
@@ -208,7 +216,7 @@ crossorigin=""/>
 			</picture>
 		</span>
 
-		to your new<br />SvelteKit app woah
+		to your new<br />SvelteKit app WORKING
 	</h1>
 
 	<h2>
