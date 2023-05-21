@@ -1,21 +1,19 @@
-<script context="module">
-  import firebase from "firebase/app";
-
-
-  export async function load({ page, fetch, session, context}){
-  console.log('Both');
-  console.log(`${page}, fetch, session, context}`)
-  initFirebase();
-  const db = firebase.firestore()
-  const places = await db.collection('places').limit(500)
-    
-  }
-</script>
-
-
 <script>
+    /* * @type {import('./$types').PageData} */
+    export let places;
+    console.log('\n\n\n')
+    console.log(places)
+    console.log('\n\n\n')
+    export const prerender = true;
+    export const ssr = true
+
   import { FirebaseApp, User, Doc, Collection } from "sveltefire";
 
+  import firebase from "firebase/app";
+  import "firebase/firestore";
+  import "firebase/auth";
+  import "firebase/performance";
+  import "firebase/analytics";
 
 
   import L from 'leaflet';
@@ -24,7 +22,8 @@
 	import * as markerIcons from './markers.js';
   import { initFirebase } from "./initFirebase";
 	let map;
-	
+  initFirebase()
+	/*
 	const markerLocations = [
 		[29.8283, -96.5795],
 		[37.8283, -90.5795],
@@ -34,7 +33,7 @@
 		[36.8283, -100.5795],
 		[38.40, -122.5795],
 	];
-	
+	*/
 	const initialView = [39.8283, -98.5795];
 	function createMap(container) {
 	  let m = L.map(container, {preferCanvas: true }).setView(initialView, 5);
@@ -112,7 +111,12 @@
 		});
 	}
 	
-
+ /**
+  * 
+  * @param {Object} place
+  * @param {number} place.lat 
+  * @param {number} place.lng
+  */
 	function createMarker(loc) {
 		let count = Math.ceil(Math.random() * 25);
 		let icon = markerIcon(count);
@@ -137,26 +141,40 @@
 	}
 	
 	function createLines() {
-		return L.polyline(markerLocations, { color: '#E4E', opacity: 0.5 });
+    if(!places){
+      console.error('No Data?')
+    }else{
+      return L.polyline(places, { color: '#E4E', opacity: 0.5 });
+    }
+		
 	}
 
 	let markerLayers;
 	let lineLayers;
   function mapAction(container) {
+
     map = createMap(container); 
 		toolbar.addTo(map);
+
+
+    if(!places){
+      console.error('No Data?')
+      return;
+    }else{
+
+      markerLayers = L.layerGroup()
+      for(let place of places) {
+        let m = createMarker(place.lat, place.lng);
+        markerLayers.addLayer(m);
+      }
+    
 		
-		markerLayers = L.layerGroup()
- 		for(let location of markerLocations) {
- 			let m = createMarker(location);
-			markerLayers.addLayer(m);
- 		}
-		
-		lineLayers = createLines();
-		
-		markerLayers.addTo(map);
-		lineLayers.addTo(map);
-		
+      lineLayers = createLines();
+      
+      markerLayers.addTo(map);
+      lineLayers.addTo(map);
+    }
+
     return {
        destroy: () => {
 				 toolbar.remove();
@@ -196,6 +214,7 @@ crossorigin=""/>
 <svelte:window on:resize={resizeMap} />
 <main>
 
+  <div></div>
   <div class="map" style="height:900px;width:100%" use:mapAction />
 
   <!-- 1. 🔥 Firebase App -->
