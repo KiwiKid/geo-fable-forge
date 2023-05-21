@@ -33,6 +33,7 @@ export async function getDocuments(collectionPath: string): Promise<Array<Docume
 		document._id = doc.id;
 		list.push(document);
 	});
+
 	return list;
 }
 

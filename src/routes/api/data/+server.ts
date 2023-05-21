@@ -21,5 +21,6 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
 		const doc = await createDocument(collectionPath);
 		docs.push(doc);
 	}*/
+
 	return new Response(JSON.stringify(docs));
 };
