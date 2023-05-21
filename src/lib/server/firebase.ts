@@ -45,3 +45,14 @@ export async function createDocument(collectionPath: string, uid: string): Promi
 	document._id = doc.id;
 	return document;
 }
+
+
+export async function createPlace(uid: string): Promise<Document> {
+	initializeFirebase();
+	const db = admin.firestore();
+	const doc = await (await db.collection('place').add({ uid })).get();
+
+	const document = <Document>doc.data(); // Just need the data on the server
+	document._id = doc.id;
+	return document;
+}

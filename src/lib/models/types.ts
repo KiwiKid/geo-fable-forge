@@ -6,3 +6,11 @@ export interface UserSession {
 	email: string | undefined;
 	uid: string | undefined;
 }
+
+export interface Place {
+	wikiId:string
+	lat:string
+	lng:string
+	title?:string
+	story?:string
+ }

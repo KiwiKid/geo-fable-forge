@@ -3,7 +3,7 @@ import { Document } from './Document';
 
 
 export class Place extends Document {
-	constructor(data: AnyObject = {}) {
+	constructor(data: AnyObject) {
 		super(data);
 		this._load(data);
 		this._dbFields.push('lat');
@@ -13,5 +13,8 @@ export class Place extends Document {
 	}
 
 	_collection = 'places';
-	count = 0;
+	lat = 0;
+	lng = 0;
+	wikiId = '';
+	title = 'loading..'
 }

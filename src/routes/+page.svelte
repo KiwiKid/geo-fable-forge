@@ -11,21 +11,25 @@
 	import MapToolbar from '../lib/components/MapToolbar.svelte';
 	import MarkerPopup from '../lib/components/MarkerPopup.svelte';
 	import * as markerIcons from '../lib/components/markers.js';
+	import type { Place } from '$lib/models/Place';
+	import { searchPlaces } from '$lib/client/wiki';
+	import LoadingIndicator from '$lib/components/LoadingIndicator.svelte';
 
 	let map:LMap | null;
 
 	const initialView:[number, number] = [39.8283, -98.5795];
 	function createMap(container:any) {
 	  let m = L.map(container, {preferCanvas: true }).setView(initialView, 5);
-    L.tileLayer(
-	    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-	    {
-	      attribution: `&copy;<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,
-	        &copy;<a href="https://carto.com/attributions" target="_blank">CARTO</a>`,
-	      subdomains: 'abcd',
-	      maxZoom: 14,
-	    }
+    	L.tileLayer(
+			'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+			{
+			attribution: `&copy;<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,
+				&copy;<a href="https://carto.com/attributions" target="_blank">CARTO</a>`,
+			subdomains: 'abcd',
+			maxZoom: 14,
+			}
 	  ).addTo(m);
+
 
     return m;
   }
@@ -90,18 +94,40 @@
 			className: 'map-marker'
 		});
 	}
+
+	function createLoadingIndicator(lat:number, lng:number, map:LMap){
+		//let icon = markerIcon(place.uid);
+		const lookingGlass:[[[number, number],[number, number], [number, number], [number, number]]] = [
+			[
+				[lat-0.015, lng+0.023], // btoom
+				[lat-0.0063, lng+0.0087], // Left
+				[lat-0.005, lng+0.0102], // TOP
+				[lat-0.014, lng+0.0242] // Right
+			]
+		]
+		if(map){
+
+		
+			const ploy = L.polygon(lookingGlass, { color: 'black'})
+				//	.addTo(map)
+			const circle = L.circle([lat, lng], { radius: 1000})
+			//.addTo(map)
+
+			const layerG = L.layerGroup()
+			layerG.addLayer(ploy)
+			layerG.addLayer(circle)
+			map.addLayer(layerG)
+			return layerG;
+		}
+		
+		
+	}
 	
- interface Place {
-	wikiId:string
-	lat:string
-	lng:string
-	title?:string
-	story?:string
- }
+
 	function createMarker(place:Place) {
 		console.log('createMarker')
 		console.log(place)
-		let icon = markerIcon(place.wikiId);
+		let icon = markerIcon(place.uid);
 		let marker = L.marker([+place.lat, +place.lng], {icon});
 		bindPopup(marker, (m:any) => {
 			console.log('bindPopup')
@@ -141,6 +167,51 @@
   function mapAction(container:any) {
 
     map = createMap(container); 
+
+	
+
+	map.on('click', async function(e){
+		console.log(`\n\n\n\n\nclick\n\n\n\n\n${e.latlng.lat}`)
+		var popLocation= e.latlng;
+
+		const div = document.createElement('div')
+		
+		let c = new LoadingIndicator({
+			target: div,
+				props: {
+					loadingPlace: {
+						lat: e.latlng.lat,
+						lng: e.latlng.lng
+					}
+				}
+			});
+
+
+
+		
+
+
+
+		if(map){
+			const loadingLayer = createLoadingIndicator(e.latlng.lat, e.latlng.lng, map)
+			const places = await searchPlaces(popLocation).then((p) => {
+				// TODO: add places to map
+				console.log(p)
+				console.log('REMOVE loadingLayer?.remove()')
+				console.log(loadingLayer)
+
+				//loadingLayer?.remove()
+			}).catch((e) => {
+				loadingLayer?.remove()
+			})
+
+			//map.fitBounds(poly.getBounds());
+
+			//	.setLatLngs()
+				//.setContent('<p>Hello world!<br />This is a nice popup.</p>')
+				//.openOn(map);  
+		}
+	})
 	//toolbar.addTo(map);
 
 
@@ -216,7 +287,7 @@ crossorigin=""/>
 			</picture>
 		</span>
 
-		to your new<br />SvelteKit app WORKING
+		to your new<br />SvelteKit app WORKING2
 	</h1>
 
 	<h2>

@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
 
 	// Can't use native fetch because this will be called by the server during SSR
-	export async function getPlaces(fetch: Fetch): Promise<Partial<UserSession>> {
+	export async function getPlaces(fetch: Fetch): Promise<Partial<Place>> {
 		const res = await fetch(`/api/data?collectionPath=places&createIfNone=true`);
 		if (res.ok) {
 			const places = await res.json();
@@ -18,6 +18,7 @@
 	import { getDocumentStore, saveDocument } from '$lib/client/firebase';
 	import { spring } from 'svelte/motion';
 	import type { Fetch, UserSession } from '$lib/models/types';
+	import type { Place } from '$lib/models/Place';
 	export let userCountData: Partial<Count>;
 
 	const countStore = getDocumentStore(Count, new Count(userCountData));

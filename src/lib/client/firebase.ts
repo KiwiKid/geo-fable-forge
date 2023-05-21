@@ -26,6 +26,7 @@ import { readable } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { AnyObject } from '$lib/models/types';
 import { invalidateAll } from '$app/navigation';
+import type { Place } from '$lib/models/Place';
 
 async function setToken(token: string) {
 	const options = {
@@ -78,6 +79,17 @@ function getDbObject(document: Document): Partial<Document> {
 			obj[k] = document[k as keyof Document];
 		});
 	return obj;
+}
+export async function savePlace(place:Place){
+	const dbObject = getDbObject(place);
+	//if (!place._collection) throw Error('Objects that extends Document must specify __collection');
+
+	if (place._id) {
+		await setDoc(doc(db, place._collection, place._id), dbObject);
+	} else {
+		const todoRef = await addDoc(collection(db, place._collection), dbObject);
+		place._id = todoRef.id;
+	}
 }
 
 export async function saveDocument(document: Document) {
