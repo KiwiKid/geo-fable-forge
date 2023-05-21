@@ -1,9 +1,8 @@
-import { error } from '@sveltejs/kit';
 import WikiJS from 'wikijs';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import qs from 'querystring'
-import { saveDocument, savePlace } from '$lib/client/firebase';
+
 
 interface RequestParams {
 	lat:string
@@ -19,7 +18,7 @@ export const GET: RequestHandler = async (params:any) => {
   const query = qs.decode(params.request.url.slice(params.request.url.indexOf('?')+1)) as unknown as RequestParams
 
   if('lat' in query && 'lng' in query){
-    const wikiRes = await WikiJS().geoSearch(+query.lat, +query.lng, 1000)
+    return await WikiJS().geoSearch(+query.lat, +query.lng, 1000)
     .then((res: string[]) => {
       console.log('WOAH WIKI CALL')
         if(res?.length == 0){
@@ -30,18 +29,46 @@ export const GET: RequestHandler = async (params:any) => {
           };
         } else {
           console.log(`Found ${res.length} matches`)
+         // createDocument('places', )
           return {
             pageNames: res as unknown as string[],
             lat: query.lat,
             lng: query.lng
           };
         }
-    }).then((pn) => ).catch((e) => {
-      console.error('Wikijs error')
-      console.error(e)
-      console.log(query)
+    })/*.then((p) => Promise.all(p.pageNames.map((pn) => WikiJS().page(pn).then((m) => mapWikiPage(m)))))
+      .then(async (fps:MappedPage[]) => {
+        const saves = await Promise.all(fps.map(async (fp) => {
+          const res = fp;
+          
+          return savePlace(new Place({
+            lat: res.lat,
+         //  _collection: 'place',
+         //  uid: 'woah',
+         //  _id: res.wiki_id,
+         //  _load: () => {
+         //    console.log('LOADED')
+         //  }
+            lng: res.lng,
+            wikiId: res.wiki_id,
+            title: res.summary,
+
+        })).then(() => {
+          console.log('place saved')
+        }).catch((e) => {
+          console.log('place save error ')
+          console.error(e)
+        })
+      }))
+      return json(saves);
+    })*/
+    .then((res) => {
+      return json({res})
     })
-    return json(wikiRes);
+    .catch((e) => {
+      return json({error: 'failed to save place '+e.stack})
+    })
+    
   }else{
     return json({error: 'failed to get wikijs'})
   }
@@ -60,5 +87,4 @@ export const GET: RequestHandler = async (params:any) => {
 		const doc = await createDocument(collectionPath);
 		docs.push(doc);
 	}*/
-	//return new Response(JSON.stringify(docs));
 };

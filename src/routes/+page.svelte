@@ -1,3 +1,4 @@
+
 <script lang="ts">
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
@@ -19,6 +20,8 @@
 
 	const initialView:[number, number] = [39.8283, -98.5795];
 	function createMap(container:any) {
+
+		
 	  let m = L.map(container, {preferCanvas: true }).setView(initialView, 5);
     	L.tileLayer(
 			'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
@@ -171,7 +174,6 @@
 	
 
 	map.on('click', async function(e){
-		console.log(`\n\n\n\n\nclick\n\n\n\n\n${e.latlng.lat}`)
 		var popLocation= e.latlng;
 
 		const div = document.createElement('div')

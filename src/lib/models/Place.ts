@@ -3,18 +3,20 @@ import { Document } from './Document';
 
 
 export class Place extends Document {
-	constructor(data: AnyObject) {
+	constructor(data: AnyObject = {}) {
 		super(data);
 		this._load(data);
-		this._dbFields.push('lat');
-        this._dbFields.push('lng');
-        this._dbFields.push('title');
-        this._dbFields.push('wikiId');
 	}
 
-	_collection = 'places';
-	lat = 0;
+	_load(data: AnyObject) {
+		if (data) {
+			Object.assign(this, data);
+		}
+	}
+	_dbFields = ['lat', 'lng', 'title', 'wikiId'];
+	_collection = 'place';
+	/*lat = 0;
 	lng = 0;
 	wikiId = '';
-	title = 'loading..'
+	title = 'loading..'*/
 }
