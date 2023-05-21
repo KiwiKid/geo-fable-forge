@@ -14,13 +14,20 @@
 	import { searchPlaces } from '$lib/client/wiki';
 	import LoadingIndicator from '$lib/components/LoadingIndicator.svelte';
 	import { onMount } from 'svelte'
-	import L from 'leaflet'
 
 	let map:L.Map | null;
 	const initialView:[number, number] = [39.8283, -98.5795];
-
+	
+	function markerIcon(content:string) {
+			let html = `<div class="map-marker"><div>${markerIcons.library}</div><div class="marker-text">${content}</div></div>`;
+			return L.divIcon({
+				html,
+				className: 'map-marker'
+			});
+		}
 
 	onMount(async () => {
+		const L = await import('leaflet')
 		let eye = true;
 		let lines = true;
 		
@@ -74,13 +81,7 @@
 		
 		//let markers = new Map();
 		
-		function markerIcon(content:string) {
-			let html = `<div class="map-marker"><div>${markerIcons.library}</div><div class="marker-text">${content}</div></div>`;
-			return L.divIcon({
-				html,
-				className: 'map-marker'
-			});
-		}
+
 				
 		// We could do these in the toolbar's click handler but this is an example
 		// of modifying the map with reactive syntax.
@@ -132,7 +133,6 @@
 			
 			return marker;
 		}
-		
 	function resizeMap() {
 			if(map) { map.invalidateSize(); }
 		}
