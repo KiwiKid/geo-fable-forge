@@ -4,6 +4,9 @@ dependencies:
   '@types/leaflet':
     specifier: ^1.9.3
     version: 1.9.3
+  '@types/svelte-leafletjs':
+    specifier: ^0.8.3
+    version: 0.8.3
   firebase:
     specifier: ^9.22.0
     version: 9.22.0
@@ -1249,6 +1252,13 @@ packages:
     dependencies:
       '@types/mime': 3.0.1
       '@types/node': 20.2.1
+    dev: false
+
+  /@types/svelte-leafletjs@0.8.3:
+    resolution: {integrity: sha512-ovUjRI95Lus5UbhTK384RRuWWmaoTwqAvZ4gqJJVjjBlLFpFREnjsfzSoP6l3+wP+LYa9AW4Bz4418es+jo5SA==}
+    dependencies:
+      '@types/leaflet': 1.9.3
+      svelte: 3.59.1
     dev: false
 
   /@typescript-eslint/eslint-plugin@5.59.6(@typescript-eslint/parser@5.59.6)(eslint@8.41.0)(typescript@4.9.5):
@@ -3462,7 +3472,6 @@ packages:
   /svelte@3.59.1:
     resolution: {integrity: sha512-pKj8fEBmqf6mq3/NfrB9SLtcJcUvjYSWyePlfCqN9gujLB25RitWK8PvFzlwim6hD/We35KbPlRteuA6rnPGcQ==}
     engines: {node: '>= 8'}
-    dev: true
 
   /teeny-request@8.0.3:
     resolution: {integrity: sha512-jJZpA5He2y52yUhA7pyAGZlgQpcB+xLjcN0eUFxr9c8hP/H7uOXbBNVo/O0C/xVfJLJs680jvkFgVJEEvk9+ww==}
