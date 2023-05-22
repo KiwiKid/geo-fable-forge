@@ -2,7 +2,9 @@ import { FIREBASE_SERVER_CONFIG } from '$env/static/private';
 import type { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import admin from 'firebase-admin';
 import type { Document } from '$lib/models/Document';
-import type { Place } from '$lib/models/types';
+import type { Place as PlaceDoc } from '$lib/models/Place';
+import type { Place } from '$lib/models/types'
+
 
 function initializeFirebase() {
 	if (!admin.apps.length) {
@@ -57,4 +59,22 @@ export async function createPlace(place: Place): Promise<Document> {
 	const document = <Document>doc.data(); // Just need the data on the server
 	document._id = doc.id;
 	return document;
+}
+
+	export async function getPlaces(leftLat: number, rightLat: number, topLng: number, bottomLng: number): Promise<Array<Place>> {
+		initializeFirebase();
+		const db = admin.firestore();
+		const placeRef = db.collection('place');
+	
+		const snapshot = await placeRef.where('lat', '>=', leftLat).where('lat', '<=', rightLat).get();
+	
+		let places: Array<PlaceDoc> = snapshot.docs.map(doc => {
+			const document = <PlaceDoc>doc.data();
+			document._id = doc.id;
+			return document;
+		});
+	
+		places = places.filter(place => place.lng >= topLng && place.lng <= bottomLng);
+	
+		return places;
 }

@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ cookies, url }) => {
 	console.log('GET SERVER.ts')
 	const decodedToken = await decodeToken(cookies.get('token') || '');
-	if (!decodedToken && !url.search.startsWith('?collectionPath=places')) {
+	if (!decodedToken && !url.search.startsWith('?collectionPath=place')) {
 
 		throw error(401, 'Not logged in');
 	}

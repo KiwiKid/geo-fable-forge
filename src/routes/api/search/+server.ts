@@ -101,12 +101,20 @@ export const GET: RequestHandler = async (params:any) => {
               lat: coords.lat,
               lng: coords.lon,
             }
+            console.log('pageRes')
+            console.log(pageRes)
 
             createPlace({
               wikiId: page.raw.pageid.toString(),
               title: page.url(),
-              lat: coords.lat.toString(),
-              lng: coords.lon.toString(),
+              lat: coords.lat,
+              lng: coords.lon,
+            }).then((res) => {
+              console.log('Wiki Place Summary row created')
+              console.log(res)
+            }).catch((e) => {
+              console.log('Wiki Place Summary row failed')
+              console.error(e)
             })
 
             // TODO: for each result, save the summary, title and lat, lng for ai story gen 
