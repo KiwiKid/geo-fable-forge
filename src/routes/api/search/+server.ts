@@ -2,6 +2,9 @@ import WikiJS from 'wikijs';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import qs from 'querystring'
+import { createPlace } from '$lib/server/firebase';
+import type { AnyObject } from '$lib/models/types';
+import type { wikiContent } from '$lib/mapWikiPage';
 
 
 interface RequestParams {
@@ -98,6 +101,13 @@ export const GET: RequestHandler = async (params:any) => {
               lat: coords.lat,
               lng: coords.lon,
             }
+
+            createPlace({
+              wikiId: page.raw.pageid.toString(),
+              title: page.url(),
+              lat: coords.lat.toString(),
+              lng: coords.lon.toString(),
+            })
 
             // TODO: for each result, save the summary, title and lat, lng for ai story gen 
 

@@ -2,6 +2,7 @@ import { FIREBASE_SERVER_CONFIG } from '$env/static/private';
 import type { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import admin from 'firebase-admin';
 import type { Document } from '$lib/models/Document';
+import type { Place } from '$lib/models/types';
 
 function initializeFirebase() {
 	if (!admin.apps.length) {
@@ -48,10 +49,10 @@ export async function createDocument(collectionPath: string, uid: string): Promi
 }
 
 
-export async function createPlace(uid: string): Promise<Document> {
+export async function createPlace(place: Place): Promise<Document> {
 	initializeFirebase();
 	const db = admin.firestore();
-	const doc = await (await db.collection('place').add({ uid })).get();
+	const doc = await (await db.collection('place').add(place)).get();
 
 	const document = <Document>doc.data(); // Just need the data on the server
 	document._id = doc.id;

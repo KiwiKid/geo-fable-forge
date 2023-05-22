@@ -11,12 +11,14 @@
 	import { searchPlaces } from '$lib/client/wiki';
 	import type { PageData } from '../../routes/$types';
 	import { onMount } from 'svelte';
-	import type * as leafletType from 'leaflet';
+	import type * as leafletTypes from 'leaflet';
 	import Page from '../../routes/+page.svelte';
+	import MapToolbar from './MapToolbar.svelte';
 	export let data: PageData;
 
 	//
-	let L: typeof leafletType | undefined;
+	let L: typeof leafletTypes | undefined;
+	const initialView:[number, number] = [39.8283, -98.5795];
 
 	onMount(async() => {
 		L = ((await import('leaflet')).default)
@@ -24,6 +26,7 @@
 		const map = createMap();
 		mapAction(map);
 	})
+
 	console.log('map import')
     let map: L.Map | null;
     
@@ -31,21 +34,27 @@
 		let lines = true;
 
 
-
-		//let toolbar = new L.Control({ position: 'topright' });
+	function addToolbar(map:L.Map){
+		if(L === undefined){
+			throw new Error("L is undefined 1")
+		}
+		let toolbar = new L.Control({ position: 'topright' });
 		let toolbarComponent:any;
-		/*toolbar.onAdd = (map:LMap) => {
+		toolbar.onAdd = (map:L.Map) => {
+			if(L === undefined){
+				throw new Error("L is undefined 2")
+			}
 			let div = L.DomUtil.create('div');
 			toolbarComponent = new MapToolbar({
 				target: div,
 				props: {}
 			});
 
-			toolbarComponent.$on('click-eye', ({ detail }) => eye = detail);
-			toolbarComponent.$on('click-lines', ({ detail }) => lines = detail);
-			//toolbarComponent.$on('click-reset', () => {
-			//	map.setView(initialView, 5, { animate: true })
-			//})
+			toolbarComponent.$on('click-eye', ({ detail }: { detail: boolean }) => eye = detail);
+			toolbarComponent.$on('click-lines', ({ detail }: { detail: boolean }) => lines = detail);
+			toolbarComponent.$on('click-reset', () => {
+				map.setView(initialView, 5, { animate: true })
+			})
 
 			return div;
 		}
@@ -55,8 +64,9 @@
 				toolbarComponent.$destroy();
 				toolbarComponent = null;
 			}
-		};*/
-		
+		};
+		toolbar.addTo(map)
+	}
 		// Create a popup with a Svelte component inside it and handle removal when the popup is torn down.
 		// `createFn` will be called whenever the popup is being created, and should create and return the component.
 		
@@ -106,7 +116,8 @@
 
 
 	function markerIcon(content:string) {
-		let html = `<div class="map-marker"><div>${markerIcons.library}</div><div class="marker-text">${content}</div></div>`;
+		let html = `<div class="map-marker"><div>${markerIcons.library}</div>
+					<div class="marker-text">${content}</div></div>`;
 		return L!.divIcon({
 			html,
 			className: 'map-marker'
@@ -150,7 +161,6 @@
 		if(!L){
 			throw new Error('\n\ncreateMap no LEAFLET\n\n')
 		}
-        const initialView:[number, number] = [39.8283, -98.5795];
 
 		const container = document.getElementById('mapContainer')
 		if(!container){
@@ -201,7 +211,7 @@
 			
 		}
 
-	function mapAction(map:leafletType.Map):SvelteActionReturnType {
+	function mapAction(map:L.Map):SvelteActionReturnType {
 
 		console.log('bower')
 		//map = createMap(); 
@@ -233,6 +243,7 @@
 					console.log(p)
 					console.log('REMOVE loadingLayer?.remove()')
 					console.log(loadingLayer)
+					
 
 					//loadingLayer?.remove()
 				}).catch((e) => {
@@ -246,26 +257,25 @@
 					//.openOn(map);  
 			}
 		})
-		//toolbar.addTo(map);
+		addToolbar(map)
 
 
 		if(!data.places){
 			console.error('No Data?')
 		}else{
 
-		let markerLayers = L!.layerGroup()
-		for(let place of data.places) {
-			console.log('for(let place of data.places) {')
-			let m = createMarker(place);
-			markerLayers.addLayer(m);
-		}
+			let markerLayers = L!.layerGroup()
+			for(let place of data.places) {
+				console.log('for(let place of data.places) {')
+				let m = createMarker(place);
+				markerLayers.addLayer(m);
+			}
 				
-		markerLayers.addTo(map);
+			markerLayers.addTo(map);
 		}
 
 		return {
 			destroy: () => {
-	//			 toolbar.remove();
 				map ? map.remove() : null
 			}
 		};

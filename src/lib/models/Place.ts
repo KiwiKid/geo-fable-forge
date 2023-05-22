@@ -6,6 +6,8 @@ export class Place extends Document {
 	constructor(data: AnyObject = {}) {
 		super(data);
 		this._load(data);
+		this._load(data);
+		this._dbFields.push('lat', 'lng', 'title', 'wikiId');
 	}
 
 	_load(data: AnyObject) {
@@ -13,10 +15,9 @@ export class Place extends Document {
 			Object.assign(this, data);
 		}
 	}
-	_dbFields = ['lat', 'lng', 'title', 'wikiId'];
 	_collection = 'place';
-	/*lat = 0;
+	lat = 0;
 	lng = 0;
 	wikiId = '';
-	title = 'loading..'*/
+	title = 'loading..'
 }

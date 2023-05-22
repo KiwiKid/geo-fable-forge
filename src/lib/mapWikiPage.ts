@@ -20,7 +20,7 @@ export interface wikiInfo {
   }
 }
 
-interface wikiContent {
+export interface wikiContent {
   title:string
   content:string
 }
@@ -75,7 +75,7 @@ const mapWikiPage = async (page:Page):Promise<MappedPage> => {
     const pageRes = {
       url: page.url(),
       id: id,
-      wiki_id: page.raw.pageid,
+      wiki_id: page.raw.pageid.toString(),
      // displayName: page.
       summary: summary_string,
       info: await page.fullInfo() as wikiInfo,
