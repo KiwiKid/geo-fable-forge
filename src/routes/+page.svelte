@@ -1,6 +1,5 @@
 
 <script lang="ts">
-	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
 	import { browser } from '$app/environment'
 	
@@ -19,20 +18,6 @@
 
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app WORKING2
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>||{browser}
-	</h2>
 	{#if browser}
 		<LeafletMap data={data}/>
 	{:else}
