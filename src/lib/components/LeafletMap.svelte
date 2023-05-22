@@ -238,7 +238,11 @@
 
 			if(map){
 				const loadingLayer = createLoadingIndicator(e.latlng.lat, e.latlng.lng, map)
-				const places = searchPlaces(popLocation).then((p) => {
+				const places = searchPlaces({
+					fetch: fetch,
+					lat: popLocation.lat,
+					lng: popLocation.lng
+				}).then((p) => {
 					// TODO: add places to map
 					console.log(p)
 					console.log('REMOVE loadingLayer?.remove()')

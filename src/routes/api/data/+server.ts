@@ -3,6 +3,7 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies, url }) => {
+	console.log('API/DATA/SERVER')
 	console.log('GET SERVER.ts')
 	const decodedToken = await decodeToken(cookies.get('token') || '');
 	if (!decodedToken && !url.search.startsWith('?collectionPath=place')) {

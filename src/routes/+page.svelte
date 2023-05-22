@@ -38,8 +38,7 @@
 	{:else}
 		<p>Loading...</p>
 	{/if}
-	
-	<h1>{JSON.stringify(data)}</h1>
+	<details><summary>Places</summary>{JSON.stringify(data)}</details>
 	{#if data.places}
 		<div>{data.places}</div>
 	{/if}

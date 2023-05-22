@@ -32,7 +32,8 @@ export interface wikiInfo {
 
 export const GET: RequestHandler = async (params:any) => {
 //	const decodedToken = await decodeToken(cookies.get('token') || '');
-	console.log(`$decodedToken:{decodedToken}`)
+  console.log('API/SEARCH/SERVER')
+
 
 
 

@@ -5,7 +5,6 @@ import type { Document } from '$lib/models/Document';
 import type { Place as PlaceDoc } from '$lib/models/Place';
 import type { Place } from '$lib/models/types'
 
-
 function initializeFirebase() {
 	if (!admin.apps.length) {
 		const serviceAccount = JSON.parse(FIREBASE_SERVER_CONFIG);
@@ -51,30 +50,53 @@ export async function createDocument(collectionPath: string, uid: string): Promi
 }
 
 
-export async function createPlace(place: Place): Promise<Document> {
+
+
+export async function getPlace(wikiId:string): Promise<Array<Place>> {
+	initializeFirebase();
+	const db = admin.firestore();
+	const querySnapshot = await db.collection('place').where("wikiId", "==", wikiId).get();
+
+	const places: Place[] = querySnapshot.docs.map((doc) => {
+		const data = doc.data();
+		const place: Place = {
+		  // Map the document data to the Place interface
+		  title: data.title,
+		  lat: data.lat,
+		  lng: data.lng,
+		  wikiId: data.wikiId
+		};
+		return place;
+	  });
+	
+	return places;
+}
+
+
+export async function createPlace(place: Place): Promise<PlaceDoc> {
 	initializeFirebase();
 	const db = admin.firestore();
 	const doc = await (await db.collection('place').add(place)).get();
 
-	const document = <Document>doc.data(); // Just need the data on the server
+	const document = <PlaceDoc>doc.data(); // Just need the data on the server
 	document._id = doc.id;
 	return document;
 }
 
-	export async function getPlaces(leftLat: number, rightLat: number, topLng: number, bottomLng: number): Promise<Array<Place>> {
-		initializeFirebase();
-		const db = admin.firestore();
-		const placeRef = db.collection('place');
-	
-		const snapshot = await placeRef.where('lat', '>=', leftLat).where('lat', '<=', rightLat).get();
-	
-		let places: Array<PlaceDoc> = snapshot.docs.map(doc => {
-			const document = <PlaceDoc>doc.data();
-			document._id = doc.id;
-			return document;
-		});
-	
-		places = places.filter(place => place.lng >= topLng && place.lng <= bottomLng);
-	
-		return places;
+export async function getPlaces(leftLat: number, rightLat: number, topLng: number, bottomLng: number): Promise<Array<Place>> {
+	initializeFirebase();
+	const db = admin.firestore();
+	const placeRef = db.collection('place');
+
+	const snapshot = await placeRef.where('lat', '>=', leftLat).where('lat', '<=', rightLat).get();
+
+	let places: Array<PlaceDoc> = snapshot.docs.map(doc => {
+		const document = <PlaceDoc>doc.data();
+		document._id = doc.id;
+		return document;
+	});
+
+	places = places.filter(place => place.lng >= topLng && place.lng <= bottomLng);
+
+	return places;
 }

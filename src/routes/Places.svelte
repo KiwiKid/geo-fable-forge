@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
 
 	// Can't use native fetch because this will be called by the server during SSR
-	export async function getPlaces(fetch: Fetch): Promise<Partial<Place>> {
+	export async function getPlaces(): Promise<Partial<Place>> {
 		// TODO: move to getPlace API with lat/lng lookup
 		const res = await fetch(`/api/data?collectionPath=place&createIfNone=true`);
 		if (res.ok) {
@@ -20,6 +20,7 @@
 	import { spring } from 'svelte/motion';
 	import type { Fetch, UserSession } from '$lib/models/types';
 	import type { Place } from '$lib/models/Place';
+	import { searchPlaces } from '$lib/client/wiki';
 	export let userCountData: Partial<Count>;
 
 	const countStore = getDocumentStore(Count, new Count(userCountData));
