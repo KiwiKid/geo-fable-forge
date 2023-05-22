@@ -124,8 +124,6 @@
 		})
 	}
 	function createMarker(place:any) {
-			console.log('createMarker')
-			console.log(place)
 			let icon = markerIcon(place.uid);
 			let marker = L!.marker([+place.lat, +place.lng], {icon})
 			bindPopup(marker, (m:any) => {

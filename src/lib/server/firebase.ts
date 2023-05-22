@@ -83,6 +83,7 @@ export async function createPlace(place: Place): Promise<PlaceDoc> {
 	return document;
 }
 
+// Were not using this until the map gets slow
 export async function getPlaces(leftLat: number, rightLat: number, topLng: number, bottomLng: number): Promise<Array<Place>> {
 	initializeFirebase();
 	const db = admin.firestore();

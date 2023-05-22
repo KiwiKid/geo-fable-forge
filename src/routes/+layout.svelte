@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../app.postcss';
 	import Header from './Header.svelte';
 	import Auth from '$lib/components/auth/Auth.svelte';
 	import './styles.css';

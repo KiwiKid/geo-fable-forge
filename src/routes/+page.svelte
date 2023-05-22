@@ -33,7 +33,7 @@
 	<h2>
 		try editing <strong>src/routes/+page.svelte</strong>||{browser}
 	</h2>
-	{#if browser || false}
+	{#if browser}
 		<LeafletMap data={data}/>
 	{:else}
 		<p>Loading...</p>
