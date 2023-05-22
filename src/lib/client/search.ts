@@ -1,7 +1,9 @@
 interface SearchPlacesRequest {
     fetch:any;
-    lat: number;
-    lng: number;
+    llat:number;
+    rlat:number
+    tlng:number
+    blng:number
   }
 
   interface SearchPlacesResponse {
@@ -12,9 +14,9 @@ interface SearchPlacesRequest {
 
 
 
-export async function wikiSearchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
+export async function searchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
     try {
-      const response = await request.fetch(`/api/wiki-search?lat=${request.lat}&lng=${request.lng}`, {
+      const response = await request.fetch(`/api/search?rlat=${request.rlat}&llat=${request.llat}&tlng=${request.tlng}&blng=${request.blng}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

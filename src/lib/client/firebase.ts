@@ -80,7 +80,7 @@ function getDbObject(document: Document): Partial<Document> {
 		});
 	return obj;
 }
-
+// HERER
 
 export async function savePlace(place:Place){
 	const dbObject = getDbObject(place);

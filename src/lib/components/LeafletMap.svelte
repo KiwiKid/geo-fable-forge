@@ -8,19 +8,49 @@
 	import MarkerPopup from './MarkerPopup.svelte';
 	import * as markerIcons from './markers.js';
 	import LoadingIndicator from './LoadingIndicator.svelte';
-	import { searchPlaces } from '$lib/client/wiki';
 	import type { PageData } from '../../routes/$types';
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import type * as leafletTypes from 'leaflet';
 	import Page from '../../routes/+page.svelte';
 	import MapToolbar from './MapToolbar.svelte';
+	import type { Place } from '$lib/models/Place';
+	import { searchPlaces } from '$lib/client/search';
+	import { wikiSearchPlaces } from '$lib/client/wiki';
 	export let data: PageData;
+
+	export async function getMapPlaces({fetch}:{ fetch:any}){
+		const bounds = map?.getBounds();
+		if(bounds){
+
+			const topLeft = bounds.getNorthWest()
+			const bottomRight = bounds.getSouthEast()
+			return await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
+		}else{
+			console.log('searchPlaces no bounds')
+		}
+	}
+		
+		// TODO: move to getPlace API with lat/lng lookup
+		/*const res = await fetch(`/api/data?collectionPath=place&createIfNone=true`);
+		if (res.ok) {
+			const places = await res.json();
+			return places;
+		}
+
+		const { message } = await res.json();
+		throw Error(message);*/
+	
 
 	//
 	let L: typeof leafletTypes | undefined;
 	const initialView:[number, number] = [39.8283, -98.5795];
-
+	
 	onMount(async() => {
+		// TODO: consider moving to:
+
+//			setContext(key, {
+//				getMap: () => map,
+//			});
 		L = ((await import('leaflet')).default)
 		console.log('leaflet-loaded')
 		const map = createMap();
@@ -209,9 +239,48 @@
 			
 		}
 
+
+		function setUrl(map:any){
+			const params = new URLSearchParams();
+			const bounds = map?.getBounds();
+			console.log('move  setUrl')
+
+			console.log(bounds)
+
+				if(bounds){
+					console.log('move end setUrl')
+					console.log()
+
+
+				const topLeft = bounds.getNorthWest()
+				const bottomRight = bounds.getSouthEast()
+
+					params.set('rlat', bottomRight.lat.toString());
+					params.set('llat', topLeft.lat.toString());
+					params.set('tlng', topLeft.lng.toString());
+					params.set('blng', bottomRight.lng.toString());
+
+
+
+					console.log(window.location.href)
+
+					const url = new URL(window.location.href);
+					url.search = params.toString();
+					console.log(url)
+					window.history.replaceState({}, '', url);
+				}
+		}
+
 	function mapAction(map:L.Map):SvelteActionReturnType {
 
 		console.log('bower')
+
+		map.on('moveend', () => {
+			console.log('move end')
+			to do, return the URL and use in lookup here
+			setUrl(map)
+			getMapPlaces({fetch})
+		})
 		//map = createMap(); 
 		map.on('click', async function(e){
 			var popLocation= e.latlng;
@@ -236,7 +305,7 @@
 
 			if(map){
 				const loadingLayer = createLoadingIndicator(e.latlng.lat, e.latlng.lng, map)
-				const places = searchPlaces({
+				const places = wikiSearchPlaces({
 					fetch: fetch,
 					lat: popLocation.lat,
 					lng: popLocation.lng

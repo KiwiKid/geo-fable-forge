@@ -20,7 +20,6 @@
 	import { spring } from 'svelte/motion';
 	import type { Fetch, UserSession } from '$lib/models/types';
 	import type { Place } from '$lib/models/Place';
-	import { searchPlaces } from '$lib/client/wiki';
 	export let userCountData: Partial<Count>;
 
 	const countStore = getDocumentStore(Count, new Count(userCountData));

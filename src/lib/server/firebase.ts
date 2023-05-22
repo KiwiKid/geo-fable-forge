@@ -91,11 +91,17 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 
 	const snapshot = await placeRef.where('lat', '>=', leftLat).where('lat', '<=', rightLat).get();
 
-	let places: Array<PlaceDoc> = snapshot.docs.map(doc => {
-		const document = <PlaceDoc>doc.data();
-		document._id = doc.id;
-		return document;
-	});
+	let places: Place[] = snapshot.docs.map((doc) => {
+		const data = doc.data();
+		const place: Place = {
+		  // Map the document data to the Place interface
+		  title: data.title,
+		  lat: data.lat,
+		  lng: data.lng,
+		  wikiId: data.wikiId
+		};
+		return place;
+	  });
 
 	places = places.filter(place => place.lng >= topLng && place.lng <= bottomLng);
 
