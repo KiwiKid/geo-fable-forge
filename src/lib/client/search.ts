@@ -15,8 +15,9 @@ interface SearchPlacesRequest {
 
 
 export async function searchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
+  console.log('SEARCH PLACES ')
     try {
-      const response = await request.fetch(`/api/search?rlat=${request.rlat}&llat=${request.llat}&tlng=${request.tlng}&blng=${request.blng}`, {
+      const response = await request.fetch(`/api/places?rlat=${request.rlat}&llat=${request.llat}&tlng=${request.tlng}&blng=${request.blng}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -24,10 +25,12 @@ export async function searchPlaces(request: SearchPlacesRequest): Promise<Search
       });
 
       if(!response){
-        throw new Error("No wiki response")
+        throw new Error("No searchPlaces response")
       }
   
-      return response.json() as unknown as SearchPlacesResponse;
+      const res = await response.json()
+
+      return res;
     } catch (error) {
       // Handle error appropriately
       

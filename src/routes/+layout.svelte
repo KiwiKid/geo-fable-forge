@@ -2,7 +2,7 @@
 	import '../app.postcss';
 	import Header from './Header.svelte';
 	import Auth from '$lib/components/auth/Auth.svelte';
-	import './styles.css';
+	// import './styles.css';
 	import { browser } from '$app/environment';
 	import { initializeFirebase } from '$lib/client/firebase';
 	import { PUBLIC_FIREBASE_CLIENT_CONFIG } from '$env/static/public';

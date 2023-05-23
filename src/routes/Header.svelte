@@ -36,7 +36,7 @@
 			<img src={github} alt="GitHub" />
 		</a>
 	</div>
-	<link href="/routes/styles.css" rel="stylesheet">
+	<!--<link href="/routes/styles.css" rel="stylesheet">-->
 
 </header>
 

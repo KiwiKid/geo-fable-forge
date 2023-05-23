@@ -1,6 +1,6 @@
 <script lang="ts">
-	//export const prerender = false;
-	//export const ssr = false;
+	export const prerender = false;
+	export const ssr = false;
 	
 	console.log('import * as L from ')
 	//import * as L from 'leaflet'
@@ -18,13 +18,14 @@
 	import { wikiSearchPlaces } from '$lib/client/wiki';
 	export let data: PageData;
 
-	export async function getMapPlaces({fetch}:{ fetch:any}){
+	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
 		const bounds = map?.getBounds();
 		if(bounds){
 
 			const topLeft = bounds.getNorthWest()
 			const bottomRight = bounds.getSouthEast()
-			return await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
+			//const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
+			const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
 		}else{
 			console.log('searchPlaces no bounds')
 		}
@@ -203,7 +204,7 @@
 				attribution: `&copy;<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,
 					&copy;<a href="https://carto.com/attributions" target="_blank">CARTO</a>`,
 				subdomains: 'abcd',
-				maxZoom: 14,
+				maxZoom: 17,
 				}
 		).addTo(m);
 
@@ -277,9 +278,9 @@
 
 		map.on('moveend', () => {
 			console.log('move end')
-			to do, return the URL and use in lookup here
 			setUrl(map)
-			getMapPlaces({fetch})
+			// TODONEXT: make this append new places to page data and only search if a unsearch lat range is found 
+			//getMapPlaces({fetch, map})
 		})
 		//map = createMap(); 
 		map.on('click', async function(e){

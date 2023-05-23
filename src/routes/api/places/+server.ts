@@ -10,9 +10,10 @@ export const GET: RequestHandler = async ({ cookies, url, params }) => {
     const rightLat = url.searchParams.get('rlat');
     const topLng = url.searchParams.get('tlng');
     const bottomLng = url.searchParams.get('blng');
-
+console.log(`${leftLat}${rightLat}${topLng}${bottomLng}`)
     // validate the parameters
     if (!leftLat || !rightLat || !topLng || !bottomLng) {
+		
         throw error(400, 'Missing param collectionPath');
       /*  return {
             status: 400,

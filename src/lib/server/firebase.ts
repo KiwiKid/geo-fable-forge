@@ -89,7 +89,11 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 	const db = admin.firestore();
 	const placeRef = db.collection('place');
 
-	const snapshot = await placeRef.where('lat', '>=', leftLat).where('lat', '<=', rightLat).get();
+	// TODO: add top/bottom filtering here
+	const snapshot = await placeRef
+				.where('lat', '<=', leftLat)
+				.where('lat', '>=', rightLat)
+				.get();
 
 	let places: Place[] = snapshot.docs.map((doc) => {
 		const data = doc.data();
@@ -102,6 +106,8 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 		};
 		return place;
 	  });
+
+	  console.log(`GOT ${places.length} PLACES lat>=${leftLat} lat <=${rightLat}`)
 
 	places = places.filter(place => place.lng >= topLng && place.lng <= bottomLng);
 
