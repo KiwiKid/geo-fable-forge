@@ -1,16 +1,32 @@
-<script>
+<script lang="ts">
+	import { populateStory } from '$lib/client/wiki';
+	import type { Place } from '$lib/models/Place';
 	import { createEventDispatcher } from 'svelte';
+	import { compute_rest_props } from 'svelte/internal';
 	//const dispatch = createEventDispatcher();
 	
-	/**
-	 * @type {any}
-	 */
-	 export let place;
+	 export let place:Place
 	
 	/*function addValue(delta) {
 		count += delta;
 		dispatch('change', count);
 	}*/
+
+	async function handleStoryPopulate(wikiId:string){
+		console.log('handleStoryPopulate')
+		const story = await populateStory({
+			fetch: fetch,
+			wikiId: wikiId
+		}).catch((e) => {
+			console.error(e)
+		})
+		
+		if(!story){
+			console.error('populate failed')	
+		}else{
+			console.log('handleStoryPopulate')
+		}
+	}
 </script>
 
 <style>
@@ -29,16 +45,10 @@
 </div>
 
 <div style="width:100%;text-align:center;font-weight:600">
-	woah{JSON.stringify(place)}
-
-
-	<img class='rounded-lg mr-2' src={`${place.main_image_url}`} alt={place.wiki_url}/>
+	{JSON.stringify(place)}
             <div>
-            <button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded">{'Close'}</button>
-                <div>
+            <button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" on:click={() => handleStoryPopulate(place.wikiId)}>{'Load'}</button>
                 <h1 class="text-xl font-bold underline text-center p-2">{place.title}</h1>
-                
-                </div>
 
                 <button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" 
 				

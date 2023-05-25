@@ -7,7 +7,7 @@ export class Place extends Document {
 		super(data);
 		this._load(data);
 		this._load(data);
-		this._dbFields.push('lat', 'lng', 'title', 'wikiId');
+		this._dbFields.push('lat', 'lng', 'title', 'wikiId', 'wikiTitle', 'wikiSummary', 'content', 'placeType');
 	}
 
 	_load(data: AnyObject) {
@@ -19,5 +19,9 @@ export class Place extends Document {
 	lat = 0;
 	lng = 0;
 	wikiId = '';
-	title = 'loading..'
+	wikiTitle = '';
+	wikiSummary = ''
+	title = 'loading..';
+	content = '';
+	placeType = '';
 }

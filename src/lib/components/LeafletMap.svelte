@@ -16,6 +16,7 @@
 	import type { Place } from '$lib/models/Place';
 	import { searchPlaces } from '$lib/client/search';
 	import { wikiSearchPlaces } from '$lib/client/wiki';
+	import { debounce } from './debouce';
 	export let data: PageData;
 
 	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
@@ -155,7 +156,7 @@
 		})
 	}
 	function createMarker(place:any) {
-			let icon = markerIcon(place.uid);
+			let icon = markerIcon(place.wikiTitle);
 			let marker = L!.marker([+place.lat, +place.lng], {icon})
 			bindPopup(marker, (m:any) => {
 				console.log('bindPopup')
@@ -244,7 +245,7 @@
 		function setUrl(map:any){
 			const params = new URLSearchParams();
 			const bounds = map?.getBounds();
-			console.log('move  setUrl')
+			console.log('move  setUrl'+JSON.stringify(bounds))
 
 			console.log(bounds)
 
@@ -256,14 +257,13 @@
 				const topLeft = bounds.getNorthWest()
 				const bottomRight = bounds.getSouthEast()
 
-					params.set('rlat', bottomRight.lat.toString());
-					params.set('llat', topLeft.lat.toString());
-					params.set('tlng', topLeft.lng.toString());
-					params.set('blng', bottomRight.lng.toString());
+					params.set('rlat', bottomRight.lat.toFixed(5).toString());
+					params.set('llat', topLeft.lat.toFixed(5).toString());
+					params.set('tlng', topLeft.lng.toFixed(5).toString());
+					params.set('blng', bottomRight.lng.toFixed(5).toString());
 
 
 
-					console.log(window.location.href)
 
 					const url = new URL(window.location.href);
 					url.search = params.toString();
@@ -276,12 +276,12 @@
 
 		console.log('bower')
 
-		map.on('moveend', () => {
+		map.on('moveend', debounce(() => {
 			console.log('move end')
 			setUrl(map)
 			// TODONEXT: make this append new places to page data and only search if a unsearch lat range is found 
 			//getMapPlaces({fetch, map})
-		})
+		}, 3000))
 		//map = createMap(); 
 		map.on('click', async function(e){
 			var popLocation= e.latlng;
@@ -298,15 +298,9 @@
 					}
 				});
 
-
-
-			
-
-
-
 			if(map){
 				const loadingLayer = createLoadingIndicator(e.latlng.lat, e.latlng.lng, map)
-				const places = wikiSearchPlaces({
+				const places = await wikiSearchPlaces({
 					fetch: fetch,
 					lat: popLocation.lat,
 					lng: popLocation.lng
@@ -315,12 +309,19 @@
 					console.log(p)
 					console.log('REMOVE loadingLayer?.remove()')
 					console.log(loadingLayer)
+
+					if(loadingLayer){
+						loadingLayer.remove()
+					}
+					
 					
 
 					//loadingLayer?.remove()
 				}).catch((e) => {
 					loadingLayer?.remove()
 				})
+
+				console.log('wikiSearchPlaces + '+places ? places : 'Null')
 
 				//map.fitBounds(poly.getBounds());
 

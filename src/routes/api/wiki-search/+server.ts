@@ -107,6 +107,8 @@ export const GET: RequestHandler = async (params:any) => {
 
             createPlace({
               wikiId: page.raw.pageid.toString(),
+              wikiTitle: page.raw.title,
+              wikiSummary: summary_string,
               title: page.url(),
               lat: coords.lat,
               lng: coords.lon,

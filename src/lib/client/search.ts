@@ -22,7 +22,9 @@ export async function searchPlaces(request: SearchPlacesRequest): Promise<Search
         headers: {
           'Content-Type': 'application/json'
         }
-      });
+      }).catch((e:any) =>{
+        console.error('Search places failed', {e})
+      })
 
       if(!response){
         throw new Error("No searchPlaces response")

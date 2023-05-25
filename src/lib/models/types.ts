@@ -9,8 +9,11 @@ export interface UserSession {
 
 export interface Place {
 	wikiId:string
+	wikiTitle:string
+	wikiSummary:string
 	lat:number
 	lng:number
+	placeType?:string
 	title?:string
-	story?:string
+	content?:string
  }

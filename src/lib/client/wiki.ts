@@ -1,3 +1,5 @@
+import type { Place } from "$lib/models/Place";
+
 interface SearchPlacesRequest {
     fetch:any;
     lat: number;
@@ -13,7 +15,6 @@ interface SearchPlacesRequest {
 
 
 export async function wikiSearchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
-    try {
       const response = await request.fetch(`/api/wiki-search?lat=${request.lat}&lng=${request.lng}`, {
         method: 'GET',
         headers: {
@@ -26,9 +27,28 @@ export async function wikiSearchPlaces(request: SearchPlacesRequest): Promise<Se
       }
   
       return response.json() as unknown as SearchPlacesResponse;
-    } catch (error) {
-      // Handle error appropriately
-      
-      throw new Error('Failed to searchPlaces.');
-    }
   }
+
+  interface PlacePopulateRequest {
+    fetch:any
+    wikiId:string
+  }
+  interface PopulatePlaceResponse {
+    place:Place
+  }
+
+export async function populateStory(request: PlacePopulateRequest):Promise<PopulatePlaceResponse>{
+  console.log('populateStory')
+  const response = await request.fetch(`/api/populate?wikiId=${request.wikiId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if(!response){
+    throw new Error("No wiki response")
+  }
+
+  return response.json() as unknown as PopulatePlaceResponse;
+}

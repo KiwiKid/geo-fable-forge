@@ -52,7 +52,7 @@ export async function createDocument(collectionPath: string, uid: string): Promi
 
 
 
-export async function getPlace(wikiId:string): Promise<Array<Place>> {
+export async function getPlace(wikiId:string): Promise<Place> {
 	initializeFirebase();
 	const db = admin.firestore();
 	const querySnapshot = await db.collection('place').where("wikiId", "==", wikiId).get();
@@ -62,14 +62,18 @@ export async function getPlace(wikiId:string): Promise<Array<Place>> {
 		const place: Place = {
 		  // Map the document data to the Place interface
 		  title: data.title,
+		  content: data.content,
 		  lat: data.lat,
 		  lng: data.lng,
-		  wikiId: data.wikiId
+		  wikiId: data.wikiId,
+		  wikiTitle: data.wikiTitle,
+		  wikiSummary: data.wikiSummary,
+		  placeType: data.placeType
 		};
 		return place;
 	  });
 	
-	return places;
+	return places[0];
 }
 
 
@@ -99,10 +103,12 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 		const data = doc.data();
 		const place: Place = {
 		  // Map the document data to the Place interface
-		  title: data.title,
 		  lat: data.lat,
 		  lng: data.lng,
-		  wikiId: data.wikiId
+		  wikiId: data.wikiId,
+		  wikiTitle: data.wikiTitle,
+		  title: data.title,
+		  content: data.content
 		};
 		return place;
 	  });

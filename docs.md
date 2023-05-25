@@ -1,0 +1,17 @@
+
+
+```http
+GET /api/populate?wikiId=20098482 HTTP/1.1
+Host: localhost:5173
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://localhost:5173/?rlat=28.74358&llat=30.88808&tlng=-96.56433&blng=-93.83972
+Content-Type: application/json
+Connection: keep-alive
+Cookie: _sp_id.1fff=4ba5e419-88e0-498e-845b-aa964af66154.1659113192.2.1661448265.1659113195.5407fc44-1da0-4fcc-a418-67351026e30d; token=eyJhbGciOiJSUzI1NiIsImtpZCI6ImQwZTFkMjM5MDllNzZmZjRhNzJlZTA4ODUxOWM5M2JiOTg4ZjE4NDUiLCJ0eXAiOiJKV1QifQ.eyJwcm92aWRlcl9pZCI6ImFub255bW91cyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9nZW9mYWJsZWZvcmdlIiwiYXVkIjoiZ2VvZmFibGVmb3JnZSIsImF1dGhfdGltZSI6MTY4NDY1MDIwNywidXNlcl9pZCI6IkU5TTNOeEdLa1RkSHd6RGd3VVlpY05mbWxDWTIiLCJzdWIiOiJFOU0zTnhHS2tUZEh3ekRnd1VZaWNOZm1sQ1kyIiwiaWF0IjoxNjg1MDEwNjg3LCJleHAiOjE2ODUwMTQyODcsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnt9LCJzaWduX2luX3Byb3ZpZGVyIjoiYW5vbnltb3VzIn19.IGOgF-Epm_dVd3eC_gFZF7m-1DgwDI1S7y-kinu0KG9kioNsjUQj5V8Lx2HB96CVZu4hWEwZQHIgzDrKA9UagdpL8SXXW9jpRJMwIglIBLy0Q2wohUkywcfErowGVwi5MTx3_GIoGxcClzpG5l_Hr8ajq_c_HsLVYy-MQ6SPymgRT0I9PNdCQL4BAHoCx63PsMBaGuC2LxUnuA8bBA8Gi13MjeqSCyzn_3PTs9DhCGs2xI5qdKqo9IGLsiCIvSCM_GjXMIFh_VS3QUkBmB6QxcG2CAWWuCN5WGiucy19Myis1sZGx-7DKQtvNiZxhvJIBi7r0LtH1-uoN7h2N0uwyQ
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+```
