@@ -81,6 +81,21 @@ function getDbObject(document: Document): Partial<Document> {
 	return obj;
 }
 // HERER
+interface SavePlaceStoryProps {
+	wikiId:string
+	, title:string
+	, content:string
+}
+export async function savePlaceStory({wikiId, title, content}:SavePlaceStoryProps){
+	const place = await getPlace(wikiId);
+
+	place.title = title;
+	place.content = content;
+
+	await setDoc(doc(db, 'place', place.wikiId), place).catch((e) =>{
+		console.error('Could not save place story', {e})
+	})
+}
 
 export async function savePlace(place:Place){
 	const dbObject = getDbObject(place);

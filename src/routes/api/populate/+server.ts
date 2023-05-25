@@ -9,6 +9,7 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
   } from "langchain/prompts";
+import { savePlace, savePlaceStory } from "$lib/client/firebase";
 
 interface RequestParams {
 	wikiId:string
@@ -69,34 +70,23 @@ export const GET:RequestHandler = async ({url}) => {
       const chain = new LLMChain({ prompt, llm });
       const response = await chain.call({ 
         place_information: place
-      });
-  
-      let res:{text:string};
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if(!response || (response.text && response.text.length == 0)){
-        return new Response(
-          JSON.stringify({error: {
-            message: 'No text repsonse'
-          }}),
-          { headers: { "Content-Type": "application/json" } },
-        )
-      }else{
-        res = {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          text: response.text,
+      }).then((aiRes) => {
+        return {
+            title: aiRes.text,
+            content: aiRes.text
         }
-      }
+      })
 
-      TODO here, save the story and title here
+
+      const placeSave = savePlaceStory({
+        wikiId: place.wikiId,
+        title: response.title,
+        content: response.content,
+      })
       
       return new Response(
         JSON.stringify({
-          data: {
-            wiki_id: place.wikiId,
-            content: res.text || 'No content',
-            type: prompt_type,
-            status: 'success'
-          }
+            placeSave
         }),
       { headers: {  "Content-Type": "application/json" } }
       )
