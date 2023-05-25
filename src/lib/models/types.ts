@@ -13,7 +13,7 @@ export interface Place {
 	wikiSummary:string
 	lat:number
 	lng:number
-	placeType:string
+	placeType?:string
 	title?:string
 	content?:string
  }

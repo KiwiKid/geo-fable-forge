@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ cookies, url, params }) => {
 	console.log('API/DATA/SERVER')
 	console.log('GET SERVER.ts')
-
+add shared starting location
     const leftLat = url.searchParams.get('llat');
     const rightLat = url.searchParams.get('rlat');
     const topLng = url.searchParams.get('tlng');

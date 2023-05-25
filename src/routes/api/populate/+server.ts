@@ -1,4 +1,4 @@
-import { getPlace } from "$lib/server/firebase";
+import { getPlace, savePlaceStory } from "$lib/server/firebase";
 import type { RequestHandler } from "./$types";
 import qs from 'querystring'
 import { ChatOpenAI } from "langchain/chat_models/openai";
@@ -9,8 +9,23 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
   } from "langchain/prompts";
-import { savePlace, savePlaceStory } from "$lib/client/firebase";
 
+  interface AIResponse {
+    title:string
+    content:string
+  }
+  
+  function parseAIResponse(input: string): AIResponse {
+    const trimedInput = input.replace(/^\n+/, '').trim();
+    const startIndex = (trimedInput.indexOf("TITLE: ") || trimedInput.indexOf('Title:')) + 7;
+    const endIndex = (trimedInput.indexOf("CONTENT: ")|| trimedInput.indexOf('Content: ')) - 1;
+    const title = trimedInput.substring(startIndex, endIndex).trim();
+  
+    const contentIndex = trimedInput.indexOf("CONTENT:") + 9;
+    const content = trimedInput.substring(contentIndex).replaceAll(/\[(\d+)\]/g, ' ').trim();
+    
+    return { title, content };
+  }
 interface RequestParams {
 	wikiId:string
 }
@@ -32,12 +47,12 @@ export const GET:RequestHandler = async ({url}) => {
     const prompts = [
         {
           prompt_type: 'oldLegend',
-          prompt: `In the style of J.R.R. Tolkien's \"Lord of the Rings,\" write an exciting, fictional story and inlcude a title and core details from the {place_information} below.
+          prompt: `In the style of J.R.R. Tolkien's "Lord of the Rings," write an exciting, fictional story and inlcude a title and core details from the {place_information} below.
           Respond with the format TITLE:[InsertStoryTitle] CONTENT:[InsertExcitingStory]`
         },
         {
           prompt_type: "galaxyExplore",
-          prompt: `In the style of \"Star Wars\", write an exciting, fictional story and include a title and core details from the {place_information} below. Try generate a unique story or plot.
+          prompt: `In the style of "Star Wars", write an exciting, fictional story and include a title and core details from the {place_information} below. Try generate a unique story or plot.
           Respond with the format TITLE:[InsertStoryTitle] CONTENT:[InsertExcitingStory]`
         }
       ]
@@ -71,9 +86,14 @@ export const GET:RequestHandler = async ({url}) => {
       const response = await chain.call({ 
         place_information: place
       }).then((aiRes) => {
+        const parsedAIRes  = parseAIResponse(aiRes.text)
+        //if(parsedAIRes?.title.length > 0 && parsedAIRes?.content.length > 0){
+          
+        //}
         return {
-            title: aiRes.text,
-            content: aiRes.text
+            title: parsedAIRes.title,
+            content: parsedAIRes.content,
+            placeType: matchingPrompt[0].prompt_type
         }
       })
 
@@ -83,6 +103,7 @@ export const GET:RequestHandler = async ({url}) => {
         title: response.title,
         content: response.content,
       })
+      console.log('[savePlaceStory]')
       
       return new Response(
         JSON.stringify({

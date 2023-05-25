@@ -87,12 +87,43 @@ export async function createPlace(place: Place): Promise<PlaceDoc> {
 	return document;
 }
 
+interface SavePlaceStoryProps {
+	wikiId:string
+	, title:string
+	, content:string
+}
+
+export async function savePlaceStory({wikiId, title, content}:SavePlaceStoryProps):Promise<void>{
+	initializeFirebase();
+	const db = admin.firestore();
+	const query = await db.collection('place').where("wikiId", "==", wikiId).get();
+
+
+	if (!query.empty) {
+		// Assuming we are only interested in the first matching document
+		const doc = query.docs[0];
+		const newDoc = {
+			...doc.data(),
+			title,
+			content,
+		}
+    
+		// Get the document's id and update
+		await db.collection('place').doc(doc.id).update(newDoc);
+	} else {
+		throw new Error("Nah")
+	}
+	// Update firebase with newDoc
+	
+}
+
 // Were not using this until the map gets slow
 export async function getPlaces(leftLat: number, rightLat: number, topLng: number, bottomLng: number): Promise<Array<Place>> {
 	initializeFirebase();
 	const db = admin.firestore();
 	const placeRef = db.collection('place');
 
+	console.log(`[getPlaces] lLat:${leftLat} rLat:${rightLat}`)
 	// TODO: add top/bottom filtering here
 	const snapshot = await placeRef
 				.where('lat', '<=', leftLat)
@@ -107,8 +138,10 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 		  lng: data.lng,
 		  wikiId: data.wikiId,
 		  wikiTitle: data.wikiTitle,
+		  wikiSummary: data.wikiSummary,
 		  title: data.title,
-		  content: data.content
+		  content: data.content,
+		  placeType: data.placeType,
 		};
 		return place;
 	  });
