@@ -21,12 +21,14 @@
 
 	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
 		const bounds = map?.getBounds();
-		if(bounds){
+		const zoom = map?.getZoom();
+		if(bounds && zoom){
 
 			const topLeft = bounds.getNorthWest()
 			const bottomRight = bounds.getSouthEast()
 			//const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
-			const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
+			const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng, zoom: zoom });
+			data.places = places;
 		}else{
 			console.log('searchPlaces no bounds')
 		}
@@ -167,14 +169,16 @@
 					}
 				});
 
-	/*			c.$on('loading', () => {
+				c.$on('loading', () => {
+					console.log('loading EVENT SUBSRIBER FIERED')
 					marker.setIcon(markerIcon('LOADING'))
 				})
 				
 				c.$on('story-load', ({detail}) => {
+					console.log('story-load EVENT SUBSRIBER FIERED')
 					// TODO: re-trigger load of this story
 					marker.setIcon(markerIcon('LOADED'));
-				});*/
+				});
 				
 				return c;
 			});
@@ -196,8 +200,16 @@
 		if(!container){
 			throw new Error("No map container?")
 		}
-
-		let m = L.map(container, {preferCanvas: true }).setView(initialView, 5);
+		const savedLocation:[number, number]|null = data.userSession && data.userSession.lastLocation ? [data.userSession.lastLocation.lng, data.userSession.lastLocation.lat] : null;
+		let m = L.map(container, {preferCanvas: true, maxZoom: 17 });
+		
+		const STARTER_LOCATION:[number, number] = [-43.5320, 172.6306];
+		const STARTER_ZOOM = 15;
+		if(savedLocation){
+			m.setView(savedLocation);
+		}else{
+			m.setView(STARTER_LOCATION, STARTER_ZOOM)
+		}
 
 		L!.tileLayer(
 				'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
@@ -242,9 +254,11 @@
 		}
 
 
-		function setUrl(map:any){
+		function setUrl(map:leafletTypes.Map){
 			const params = new URLSearchParams();
 			const bounds = map?.getBounds();
+			const center = map?.getCenter();
+			const zoom = map?.getZoom();
 			console.log('move  setUrl'+JSON.stringify(bounds))
 
 			console.log(bounds)
@@ -263,7 +277,15 @@
 					params.set('blng', bottomRight.lng.toFixed(5).toString());
 
 
+					if(data.userSession){
+						data.userSession.lastLocation = {
+							lat: center.lat,
+							lng: center.lng,
+							zoom: zoom
+						}
+					}
 
+					
 
 					const url = new URL(window.location.href);
 					url.search = params.toString();
@@ -310,9 +332,12 @@
 					console.log('REMOVE loadingLayer?.remove()')
 					console.log(loadingLayer)
 
-					if(loadingLayer){
-						loadingLayer.remove()
-					}
+					
+					getMapPlaces({fetch, map}).then((p) => {
+						if(loadingLayer){
+							loadingLayer.remove()
+						}
+					})
 					
 					
 

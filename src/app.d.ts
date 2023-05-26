@@ -1,4 +1,4 @@
-declare const { UserSession }: import('$lib/models/types');
+const { UserSession }: import('$lib/models/types');
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces

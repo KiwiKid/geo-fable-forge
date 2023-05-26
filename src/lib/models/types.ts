@@ -5,6 +5,12 @@ export interface UserSession {
 	name: string | undefined;
 	email: string | undefined;
 	uid: string | undefined;
+	foundPlaces: string[];
+	lastLocation: {
+		lat:number,
+		lng:number,
+		zoom:number
+	}
 }
 
 export interface Place {

@@ -2,6 +2,7 @@
 
 	// Can't use native fetch because this will be called by the server during SSR
 	export async function getPlaces(): Promise<Partial<Place>> {
+		console.log('old getPlaces?')
 		// TODO: move to getPlace API with lat/lng lookup
 		const res = await fetch(`/api/data?collectionPath=place&createIfNone=true`);
 		if (res.ok) {

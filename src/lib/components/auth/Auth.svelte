@@ -4,7 +4,7 @@
 
 </script>
 <svelte:window on:load={() => setTimeout(() => {
-	if(page && !page.data.userSession){
+	if($page && !$page.data.userSession){
 		anonSignIn()
 	}
 }, 1000)} />

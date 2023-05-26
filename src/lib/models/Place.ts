@@ -1,5 +1,8 @@
 import type { AnyObject } from '$lib/models/types';
 import { Document } from './Document';
+import { z} from 'zod'
+
+export const searchSchema =  z.object({ llat: z.string(), rlat: z.string(), blng: z.string(), tlng: z.string(), zoom: z.string() })
 
 
 export class Place extends Document {

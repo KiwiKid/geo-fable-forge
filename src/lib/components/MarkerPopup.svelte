@@ -3,7 +3,8 @@
 	import type { Place } from '$lib/models/Place';
 	import { createEventDispatcher } from 'svelte';
 	import { compute_rest_props } from 'svelte/internal';
-	//const dispatch = createEventDispatcher();
+	import { getPlaces } from '../../routes/Places.svelte';
+	const dispatch = createEventDispatcher();
 	
 	 export let place:Place
 	
@@ -11,21 +12,38 @@
 		count += delta;
 		dispatch('change', count);
 	}*/
+	type MarkerState = 'loading' | 'populated' | 'mine' | 'unpopulated'
+	let markerState:MarkerState = getMarkerState()
 
 	async function handleStoryPopulate(wikiId:string){
 		console.log('handleStoryPopulate')
-		const story = await populateStory({
+		dispatch('loading')
+		
+		await populateStory({
 			fetch: fetch,
 			wikiId: wikiId
-		}).catch((e) => {
+		}).then((story) => {
+			console.log('handleStoryPopulate'+story+' Re-loading places..')
+			// TODO: this could just reload this place
+			dispatch('story-load')
+			getPlaces();
+		})
+		.catch((e) => {
+			console.error('populate failed')	
+
 			console.error(e)
 		})
-		
-		if(!story){
-			console.error('populate failed')	
-		}else{
-			console.log('handleStoryPopulate'+story)
+	}
+
+	function getMarkerState(){
+		if(place.title || place.content){
+			// todo: check the userSession.foundPlaces array
+			return 'populated'
 		}
+		if(place.wikiId){
+			return 'unpopulated'
+		}
+		return 'loading'
 	}
 </script>
 

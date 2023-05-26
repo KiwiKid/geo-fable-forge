@@ -4,6 +4,7 @@ interface SearchPlacesRequest {
     rlat:number
     tlng:number
     blng:number
+    zoom:number;
   }
 
   interface SearchPlacesResponse {
@@ -17,7 +18,7 @@ interface SearchPlacesRequest {
 export async function searchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
   console.log('SEARCH PLACES ')
     try {
-      const response = await request.fetch(`/api/places?rlat=${request.rlat}&llat=${request.llat}&tlng=${request.tlng}&blng=${request.blng}`, {
+      const response = await request.fetch(`/api/places?rlat=${request.rlat}&llat=${request.llat}&tlng=${request.tlng}&blng=${request.blng}&zoom=${request.zoom}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

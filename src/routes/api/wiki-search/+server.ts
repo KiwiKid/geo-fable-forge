@@ -113,10 +113,10 @@ export const GET: RequestHandler = async (params:any) => {
               lat: coords.lat,
               lng: coords.lon,
             }).then((res) => {
-              console.log('Wiki Place Summary row created')
+              console.log('Place row created (with wiki data')
               console.log(res)
             }).catch((e) => {
-              console.log('Wiki Place Summary row failed')
+              console.log('Place row failed')
               console.error(e)
             })
 
