@@ -1,5 +1,4 @@
-import { createDocument, getDocuments, decodeToken, getPlaces } from '$lib/server/firebase';
-import { error } from '@sveltejs/kit';
+import { getPlaces } from '$lib/server/firebase';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { searchSchema } from '$lib/models/Place';

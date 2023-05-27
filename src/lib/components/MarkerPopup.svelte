@@ -23,10 +23,11 @@
 			fetch: fetch,
 			wikiId: wikiId
 		}).then((story) => {
-			console.log('handleStoryPopulate'+story+' Re-loading places..')
+			console.log('handleStoryPopulate'+JSON.stringify(story)+' Re-loading places..')
 			// TODO: this could just reload this place
-			dispatch('story-load')
-			getPlaces();
+			dispatch('story-load', { story })
+			place = story.place
+			//getPlaces();
 		})
 		.catch((e) => {
 			console.error('populate failed')	

@@ -1,3 +1,5 @@
+import type { Place } from "$lib/models/Place";
+
 interface SearchPlacesRequest {
     fetch:any;
     llat:number;
@@ -8,15 +10,13 @@ interface SearchPlacesRequest {
   }
 
   interface SearchPlacesResponse {
-    pageNames: string[];
-    lat: number;
-    lng: number;
+    places:Place[]
   }
 
 
 
 export async function searchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
-  console.log('SEARCH PLACES ')
+  console.log('SEARCH PLACES client')
     try {
       const response = await request.fetch(`/api/places?rlat=${request.rlat}&llat=${request.llat}&tlng=${request.tlng}&blng=${request.blng}&zoom=${request.zoom}`, {
         method: 'GET',
@@ -33,7 +33,11 @@ export async function searchPlaces(request: SearchPlacesRequest): Promise<Search
   
       const res = await response.json()
 
-      return res;
+      console.log(`SEARCH PLACES client ${res.length}`)
+
+      return {
+        places: res
+      }
     } catch (error) {
       // Handle error appropriately
       

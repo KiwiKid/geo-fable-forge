@@ -80,11 +80,18 @@ export async function getPlace(wikiId:string): Promise<Place> {
 export async function createPlace(place: Place): Promise<PlaceDoc> {
 	initializeFirebase();
 	const db = admin.firestore();
-	const doc = await (await db.collection('place').add(place)).get();
+	const existingPlace = await db.collection('place').where("wikiId", "==", place.wikiId).get();
+	if(existingPlace.empty){
+		const doc = await (await db.collection('place').add(place)).get();
+		const document = <PlaceDoc>doc.data(); // Just need the data on the server
+		document._id = doc.id;
+		return document;
+	}else{
+		return <PlaceDoc>existingPlace.docs[0].data()
+	}
+	
 
-	const document = <PlaceDoc>doc.data(); // Just need the data on the server
-	document._id = doc.id;
-	return document;
+	
 }
 
 interface SavePlaceStoryProps {
@@ -93,7 +100,7 @@ interface SavePlaceStoryProps {
 	, content:string
 }
 
-export async function savePlaceStory({wikiId, title, content}:SavePlaceStoryProps):Promise<void>{
+export async function savePlaceStory({wikiId, title, content}:SavePlaceStoryProps):Promise<Place>{
 	initializeFirebase();
 	const db = admin.firestore();
 	const query = await db.collection('place').where("wikiId", "==", wikiId).get();
@@ -109,7 +116,30 @@ export async function savePlaceStory({wikiId, title, content}:SavePlaceStoryProp
 		}
     
 		// Get the document's id and update
-		await db.collection('place').doc(doc.id).update(newDoc);
+		const docUpdate = db.collection('place').doc(doc.id)
+		
+		await docUpdate.update(newDoc)
+
+		const placeDoc = await docUpdate.get()
+
+		if(placeDoc.exists && placeDoc.data()){
+			const data = placeDoc.data();
+
+			 const place: Place = {
+				// Map the document data to the Place interface
+				title: data.title,
+				content: data.content,
+				lat: data.lat,
+				lng: data.lng,
+				wikiId: data.wikiId,
+				wikiTitle: data.wikiTitle,
+				wikiSummary: data.wikiSummary,
+				placeType: data.placeType
+			  };
+
+			  return place;
+		}
+		throw new Error("Nah2")
 	} else {
 		throw new Error("Nah")
 	}
@@ -128,9 +158,11 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 	const snapshot = await placeRef
 				.where('lat', '<=', leftLat)
 				.where('lat', '>=', rightLat)
+				//.where('lng', '<=', topLng)
+				//.where('lng', '>=', bottomLng)
 				.get();
 
-	let places: Place[] = snapshot.docs.map((doc) => {
+	const places: Place[] = snapshot.docs.map((doc) => {
 		const data = doc.data();
 		const place: Place = {
 		  // Map the document data to the Place interface
@@ -146,9 +178,9 @@ export async function getPlaces(leftLat: number, rightLat: number, topLng: numbe
 		return place;
 	  });
 
-	  console.log(`GOT ${places.length} PLACES lat>=${leftLat} lat <=${rightLat}`)
-
-	places = places.filter(place => place.lng >= bottomLng && place.lng <= topLng);
+	  console.log(`GOT(1) ${places.length} PLACES lat>=${leftLat} lat <=${rightLat}`)
+	//places = places.filter(place => place.lng >= topLng && place.lng <= bottomLng);
+	//console.log(`GOT(2) ${places.length} PLACES lat>=${leftLat} lat <=${rightLat}`)
 
 	return places;
 }

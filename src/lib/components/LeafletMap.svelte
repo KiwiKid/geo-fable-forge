@@ -22,13 +22,20 @@
 	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
 		const bounds = map?.getBounds();
 		const zoom = map?.getZoom();
+
+		
 		if(bounds && zoom){
 
 			const topLeft = bounds.getNorthWest()
 			const bottomRight = bounds.getSouthEast()
 			//const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng});
-			const places =  await searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng, zoom: zoom });
-			data.places = places;
+			searchPlaces({fetch, llat: +topLeft.lat, rlat:+bottomRight.lat, tlng: +topLeft.lat, blng: +bottomRight.lng, zoom: zoom })
+				.then((newPlaces) => {
+					let uniqueNewPlaces = newPlaces.places.filter(
+							(newPlace:Place) => !data.places.some((existingPlace:Place) => existingPlace.wikiId === newPlace.wikiId)
+						);
+					data.places = data.places.concat(uniqueNewPlaces);
+				})
 		}else{
 			console.log('searchPlaces no bounds')
 		}
@@ -157,6 +164,8 @@
 			className: 'map-marker'
 		})
 	}
+
+	
 	function createMarker(place:any) {
 			let icon = markerIcon(place.wikiTitle);
 			let marker = L!.marker([+place.lat, +place.lng], {icon})
@@ -175,7 +184,7 @@
 				})
 				
 				c.$on('story-load', ({detail}) => {
-					console.log('story-load EVENT SUBSRIBER FIERED')
+					console.log('story-load EVENT SUBSRIBER FIERED'+detail)
 					// TODO: re-trigger load of this story
 					marker.setIcon(markerIcon('LOADED'));
 				});
@@ -277,13 +286,13 @@
 					params.set('blng', bottomRight.lng.toFixed(5).toString());
 
 
-					if(data.userSession){
+					/*if(data.userSession){
 						data.userSession.lastLocation = {
 							lat: center.lat,
 							lng: center.lng,
 							zoom: zoom
 						}
-					}
+					}*/
 
 					
 
@@ -296,17 +305,15 @@
 
 	function mapAction(map:L.Map):SvelteActionReturnType {
 
-		console.log('bower')
-
 		map.on('moveend', debounce(() => {
 			console.log('move end')
 			setUrl(map)
 			// TODONEXT: make this append new places to page data and only search if a unsearch lat range is found 
-			//getMapPlaces({fetch, map})
+			getMapPlaces({fetch, map})
 		}, 3000))
 		//map = createMap(); 
 		map.on('click', async function(e){
-			var popLocation= e.latlng;
+			var popLocation = e.latlng;
 
 			const div = document.createElement('div')
 			
@@ -322,17 +329,12 @@
 
 			if(map){
 				const loadingLayer = createLoadingIndicator(e.latlng.lat, e.latlng.lng, map)
-				const places = await wikiSearchPlaces({
+				await wikiSearchPlaces({
 					fetch: fetch,
 					lat: popLocation.lat,
 					lng: popLocation.lng
 				}).then((p) => {
-					// TODO: add places to map
-					console.log(p)
-					console.log('REMOVE loadingLayer?.remove()')
-					console.log(loadingLayer)
-
-					
+				
 					getMapPlaces({fetch, map}).then((p) => {
 						if(loadingLayer){
 							loadingLayer.remove()
@@ -345,8 +347,6 @@
 				}).catch((e) => {
 					loadingLayer?.remove()
 				})
-
-				console.log('wikiSearchPlaces + '+places ? places : 'Null')
 
 				//map.fitBounds(poly.getBounds());
 

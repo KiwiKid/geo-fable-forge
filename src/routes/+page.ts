@@ -33,7 +33,7 @@ export const load: PageLoad = async function load({ fetch, parent, url }) {
 	}) : parentData.places;
 // searchPlaces({fetch, lat: parseInt(lat) || 0, lng: parseInt(lng) || 0})
 	return {
-		places,
+		places: places.places,
 		location: coordinates
 	};
 };
