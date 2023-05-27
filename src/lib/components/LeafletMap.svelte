@@ -18,7 +18,10 @@
 	import { wikiSearchPlaces } from '$lib/client/wiki';
 	import { debounce } from './debouce';
 	import { Timer } from './timer';
+	import { updateProfile } from 'firebase/auth';
 	export let data: PageData;
+
+	let popupCount = 0;
 
 	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
 		const bounds = map?.getBounds();
@@ -157,8 +160,8 @@
 		}
 
 
-	function markerIcon(content:string) {
-		let html = `<div class="map-marker"><div>${markerIcons.library}</div>
+	function markerIcon(content:string, isPopulated:boolean) {
+		let html = `<div class="map-marker"><div>${isPopulated ? markerIcons.envelopeOpen : markerIcons.envelope}</div>
 					<div class="marker-text">${content}</div></div>`;
 		return L!.divIcon({
 			html,
@@ -168,8 +171,15 @@
 
 	
 	function createMarker(place:any) {
-			let icon = markerIcon(place.wikiTitle);
+			let icon = markerIcon(place.wikiTitle, !!place.content);
 			let marker = L!.marker([+place.lat, +place.lng], {icon})
+			marker.on('popupopen', () =>{
+				popupCount++;
+			})
+
+			marker.on('popupclose', () => {
+				popupCount--;
+			})
 			bindPopup(marker, (m:any) => {
 				console.log('bindPopup')
 				let c = new MarkerPopup({
@@ -181,24 +191,26 @@
 
 				const loadingTimer = new Timer();
 
+
+
 				c.$on('loading', () => {
 					console.log('loading EVENT SUBSRIBER FIERED')
 					loadingTimer.methodToCallEverySecond = (timePassed) => {
-						marker.setIcon(markerIcon(`${timePassed}s`))
+						marker.setIcon(markerIcon(`${timePassed}s`, false))
 						marker.setPopupContent(`Loading story (${timePassed}s so far)`)
 					}
 					loadingTimer.start()
 					
 				})
 				
-				c.$on('story-load', ({detail}) => {
+				c.$on('story-load', async ({detail}) => {
 					console.log('story-load EVENT SUBSRIBER FIERED'+JSON.stringify(detail))
 					// TODO: re-trigger load of this story
-					marker.setIcon(markerIcon('LOADED'));
+					marker.setIcon(markerIcon('LOADED', true));
 					marker.openPopup();
-
-					//const updatedPlace = await getPlace(fetch, place.wikiId)
-					//marker.setPopupContent(`<div>${JSON.stringify(updatedPlace)}</div>`)
+					
+					const updatedPlace = await getPlace(fetch, place.wikiId)
+					data.places = data.places.filter((dp:Place) => dp.wikiId == place.wikiId).concat(updatedPlace)
 					loadingTimer.stop();
 				});
 				
@@ -326,6 +338,8 @@
 		}, 3000))
 		//map = createMap(); 
 		map.on('click', async function(e){
+			fix this check so the load button can be pressed without a 
+			if(popupCount !== 0) return;
 			var popLocation = e.latlng;
 
 			const div = document.createElement('div')
@@ -397,5 +411,5 @@
 	integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
 	crossorigin=""/> 
 </svelte:head>
-
+<h1>{popupCount}</h1>
 <div id="mapContainer" style="height:900px;width:100%" />

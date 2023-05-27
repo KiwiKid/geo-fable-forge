@@ -15,7 +15,8 @@
 	type MarkerState = 'loading' | 'populated' | 'mine' | 'unpopulated'
 	let markerState:MarkerState = getMarkerState()
 
-	async function handleStoryPopulate(wikiId:string){
+	async function handleStoryPopulate(evt:any, wikiId:string){
+		evt.preventDefault();
 		console.log('handleStoryPopulate')
 		dispatch('loading')
 		markerState = 'loading'
@@ -28,7 +29,7 @@
 			// TODO: this could just reload this place
 			dispatch('story-load', { story })
 			markerState = 'populated'
-			place = story.place
+			
 			//getPlaces();
 		})
 		.catch((e) => {
@@ -48,6 +49,14 @@
 		}
 		return 'loading'
 	}
+
+	export function getPopulatedMarkerContent(title:string, content:string){
+		return `<h1 class="text-md font-bold underline text-center p-2">${title}</h1>
+					<div>
+						${content}
+					</div>
+					<details class="max-w-96 whitespace-pre"><summary>[Generated with AI]</summary><pre> {JSON.stringify(place, undefined, 4)}</pre></details>`
+	}
 </script>
 
 <style>
@@ -58,31 +67,20 @@
 	.leaflet-popup-close-button {
       transform: scale(2);
     }
+
 </style>
 
-<div>
-	<!--<button on:click={() => addValue(-1)}>
-		-
-	</button>
-	<button on:click={() => addValue(1)}>
-		+
-	</button>	-->
-</div>
-
-<div class="w-96 max-h-96 whitespace-normal overflow-y-auto" style="width:100%;text-align:center;font-weight:600 ">
-            <div>
+<div style="width:300px" class="max-h-36 whitespace-pre-wrap overflow-y-auto">
+            <div style="width:300px">
 
 				{#if place.content}
-					<h1 class="text-xl font-bold underline text-center p-2">{place.title}</h1>
-					<div>
-						{place.content}
-					</div>
-					<details class="max-w-96 whitespace-pre"><summary>[Generated with AI]</summary><pre> {JSON.stringify(place, undefined, 4)}</pre></details>
+				{@html getPopulatedMarkerContent(place.title, place.content)}
 
 				{:else}
 					<h1>SEED: {place.wikiTitle}</h1>
+					<button style="width:300px" class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" on:click={(evt) => handleStoryPopulate(evt, place.wikiId)}>Load</button>
+
 					<details><summary></summary>{place.wikiSummary}</details>
-					<button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" on:click={() => handleStoryPopulate(place.wikiId)}>Load</button>
 				{/if}
             
 		</div>

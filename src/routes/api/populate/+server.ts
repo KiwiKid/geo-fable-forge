@@ -74,17 +74,17 @@ export const GET:RequestHandler = async ({url}) => {
           matchingPrompt[0].prompt
          // `In the style of J.R.R. Tolkien's \"Lord of the Rings,\" write an exciting, fictional story and inlcude a title and core details from the {place_information} below.
          // Respond with the format TITLE:[InsertStoryTitle] CONTENT:[InsertExcitingStory]`
-        )
-        //prompts.HumanMessagePromptTemplate.fromTemplate("{input}"),
+        ),
+        HumanMessagePromptTemplate.fromTemplate("{place_information}"),
       ]);
       const promptSettings = {
         temperature: 1
       }
   
-      const llm = new ChatOpenAI();
+      const llm = new ChatOpenAI(promptSettings);
       const chain = new LLMChain({ prompt, llm });
       const response = await chain.call({ 
-        place_information: place
+        place_information: place.wikiSummary
       }).then((aiRes) => {
         const parsedAIRes  = parseAIResponse(aiRes.text)
         //if(parsedAIRes?.title.length > 0 && parsedAIRes?.content.length > 0){
