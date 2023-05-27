@@ -22,6 +22,10 @@
 	export let data: PageData;
 
 	let popupCount = 0;
+	let loadingCount = 0;
+	let loadedStory = ''
+	let loadedTitle = ''
+	let pageMode:'newLocationSearch'|'exploreExisting' = data.places.length > 0 ? 'exploreExisting' : 'newLocationSearch'
 
 	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
 		const bounds = map?.getBounds();
@@ -94,9 +98,14 @@
 				target: div,
 				props: {}
 			});
-
+			// pageMode
 			toolbarComponent.$on('click-eye', ({ detail }: { detail: boolean }) => eye = detail);
-			toolbarComponent.$on('click-lines', ({ detail }: { detail: boolean }) => lines = detail);
+			toolbarComponent.$on('click-eye', ({ detail }: { detail: boolean }) => eye = detail);
+
+			toolbarComponent.$on('click-lines', ({ detail }: { detail: boolean }) => {
+				lines = detail
+				pageMode = pageMode === 'exploreExisting' ? 'newLocationSearch' : 'exploreExisting'
+			});
 			toolbarComponent.$on('click-reset', () => {
 				map.setView(initialView, 5, { animate: true })
 			})
@@ -160,8 +169,9 @@
 		}
 
 
-	function markerIcon(content:string, isPopulated:boolean) {
-		let html = `<div class="map-marker"><div>${isPopulated ? markerIcons.envelopeOpen : markerIcons.envelope}</div>
+	function markerIcon(content:string, isPopulated:boolean, isLoading:boolean) {
+		const icon = isLoading ? markerIcons.sparkles : isPopulated ? markerIcons.envelopeOpen : markerIcons.envelope;
+		let html = `<div class="map-marker"><div>${icon}</div>
 					<div class="marker-text">${content}</div></div>`;
 		return L!.divIcon({
 			html,
@@ -171,7 +181,7 @@
 
 	
 	function createMarker(place:any) {
-			let icon = markerIcon(place.wikiTitle, !!place.content);
+			let icon = markerIcon(place.wikiTitle, !!place.content, false);
 			let marker = L!.marker([+place.lat, +place.lng], {icon})
 			marker.on('popupopen', () =>{
 				popupCount++;
@@ -196,7 +206,7 @@
 				c.$on('loading', () => {
 					console.log('loading EVENT SUBSRIBER FIERED')
 					loadingTimer.methodToCallEverySecond = (timePassed) => {
-						marker.setIcon(markerIcon(`${timePassed}s`, false))
+						marker.setIcon(markerIcon(`${timePassed}s`, false, true))
 						marker.setPopupContent(`Loading story (${timePassed}s so far)`)
 					}
 					loadingTimer.start()
@@ -206,11 +216,15 @@
 				c.$on('story-load', async ({detail}) => {
 					console.log('story-load EVENT SUBSRIBER FIERED'+JSON.stringify(detail))
 					// TODO: re-trigger load of this story
-					marker.setIcon(markerIcon('LOADED', true));
+					marker.setIcon(markerIcon('LOADED', true, false));
 					marker.openPopup();
 					
 					const updatedPlace = await getPlace(fetch, place.wikiId)
-					data.places = data.places.filter((dp:Place) => dp.wikiId == place.wikiId).concat(updatedPlace)
+
+					console.log(updatedPlace)
+					
+					loadedTitle = detail.story.placeSave.title;
+					loadedStory = detail.story.placeSave.content;
 					loadingTimer.stop();
 				});
 				
@@ -260,6 +274,7 @@
 
 
 	function createLoadingIndicator(lat:number, lng:number, map:L.Map){
+			loadingCount++
 			//let icon = markerIcon(place.uid);
 			const lookingGlass:[[[number, number],[number, number], [number, number], [number, number]]] = [
 				[
@@ -338,8 +353,7 @@
 		}, 3000))
 		//map = createMap(); 
 		map.on('click', async function(e){
-			fix this check so the load button can be pressed without a 
-			if(popupCount !== 0) return;
+			if(pageMode !== 'newLocationSearch') return;
 			var popLocation = e.latlng;
 
 			const div = document.createElement('div')
@@ -411,5 +425,5 @@
 	integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
 	crossorigin=""/> 
 </svelte:head>
-<h1>{popupCount}</h1>
+<h1>{loadingCount} --- {pageMode}</h1>
 <div id="mapContainer" style="height:900px;width:100%" />

@@ -17,6 +17,7 @@
 
 	async function handleStoryPopulate(evt:any, wikiId:string){
 		evt.preventDefault();
+		evt.stopPropagation();
 		console.log('handleStoryPopulate')
 		dispatch('loading')
 		markerState = 'loading'
@@ -70,8 +71,8 @@
 
 </style>
 
-<div style="width:300px" class="max-h-36 whitespace-pre-wrap overflow-y-auto">
-            <div style="width:300px">
+<div style="width:400px" class="max-h-36 whitespace-pre-wrap overflow-y-auto">
+            <div style="width:400px">
 
 				{#if place.content}
 				{@html getPopulatedMarkerContent(place.title, place.content)}

@@ -4,7 +4,6 @@ class Timer {
   private startTime?: number;
 
   methodToCallEverySecond(elapsedTime: number): void {
-    console.log(`Called after ${elapsedTime} seconds...`);
     // put your code here
   }
 
@@ -15,7 +14,6 @@ class Timer {
     this.timerId = setInterval(() => {
       if (!this.shouldStop) {
         const elapsedTime = (Date.now() - this.startTime!) / 1000;
-        console.log(elapsedTime)
         this.methodToCallEverySecond(+elapsedTime.toFixed(0));
       }
     }, 1000);

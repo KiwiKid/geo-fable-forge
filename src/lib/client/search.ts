@@ -13,10 +13,10 @@ interface SearchPlacesRequest {
     places:Place[]
   }
 
-export async function getPlace(request:any, wikiId:string){
+export async function getPlace(fetch:any, wikiId:string){
   console.log('getPlace client')
     try {
-      const response = await request.fetch(`/api/place?wikiId=${wikiId}`, {
+      const response = await fetch(`/api/place?wikiId=${wikiId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

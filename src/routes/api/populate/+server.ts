@@ -98,7 +98,7 @@ export const GET:RequestHandler = async ({url}) => {
       })
 
 
-      const placeSave = savePlaceStory({
+      const placeSave = await savePlaceStory({
         wikiId: place.wikiId,
         title: response.title,
         content: response.content,
@@ -111,6 +111,4 @@ export const GET:RequestHandler = async ({url}) => {
         }),
       { headers: {  "Content-Type": "application/json" } }
       )
-
-    return new Response(JSON.stringify(place))
 }
