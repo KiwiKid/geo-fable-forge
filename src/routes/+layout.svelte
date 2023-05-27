@@ -7,6 +7,8 @@
 	import { initializeFirebase } from '$lib/client/firebase';
 	import { PUBLIC_FIREBASE_CLIENT_CONFIG } from '$env/static/public';
 
+	export const prerender = true;
+	
 	if (browser) {
 		try {
 			initializeFirebase(JSON.parse(PUBLIC_FIREBASE_CLIENT_CONFIG));
