@@ -13,7 +13,35 @@ interface SearchPlacesRequest {
     places:Place[]
   }
 
+export async function getPlace(request:any, wikiId:string){
+  console.log('getPlace client')
+    try {
+      const response = await request.fetch(`/api/place?wikiId=${wikiId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).catch((e:any) =>{
+        console.error('Search place failed', {e})
+      })
 
+      if(!response){
+        throw new Error("No searchPlace response")
+      }
+  
+      const res = await response.json()
+
+      console.log(`SEARCH PLACES client ${res.length}`)
+
+      return {
+        place: res
+      }
+    } catch (error) {
+      // Handle error appropriately
+      
+      throw new Error('Failed to searchPlaces.');
+    }
+}
 
 export async function searchPlaces(request: SearchPlacesRequest): Promise<SearchPlacesResponse> {
   console.log('SEARCH PLACES client')

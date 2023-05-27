@@ -18,14 +18,14 @@
 
 
 <section>
-	{#if browser}
+	{#if browser && !!window}
 		<LeafletMap data={data}/>
 	{:else}
 		<p>Loading...</p>
 	{/if}
-	<details><summary>Places ({data.places.length})</summary>{JSON.stringify(data)}</details>
 	{#if data.places}
-		<div>{data.places}</div>
+
+	<details><summary>Places ({data.places.length})</summary>{JSON.stringify(data)}</details>
 	{/if}
 </section>
 

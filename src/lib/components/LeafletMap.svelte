@@ -14,16 +14,17 @@
 	import Page from '../../routes/+page.svelte';
 	import MapToolbar from './MapToolbar.svelte';
 	import type { Place } from '$lib/models/Place';
-	import { searchPlaces } from '$lib/client/search';
+	import { getPlace, searchPlaces } from '$lib/client/search';
 	import { wikiSearchPlaces } from '$lib/client/wiki';
 	import { debounce } from './debouce';
+	import { Timer } from './timer';
 	export let data: PageData;
 
 	export async function getMapPlaces({fetch, map}:{ fetch:any, map:leafletTypes.Map}){
 		const bounds = map?.getBounds();
 		const zoom = map?.getZoom();
 
-		
+
 		if(bounds && zoom){
 
 			const topLeft = bounds.getNorthWest()
@@ -178,15 +179,27 @@
 					}
 				});
 
+				const loadingTimer = new Timer();
+
 				c.$on('loading', () => {
 					console.log('loading EVENT SUBSRIBER FIERED')
-					marker.setIcon(markerIcon('LOADING'))
+					loadingTimer.methodToCallEverySecond = (timePassed) => {
+						marker.setIcon(markerIcon(`${timePassed}s`))
+						marker.setPopupContent(`Loading story (${timePassed}s so far)`)
+					}
+					loadingTimer.start()
+					
 				})
 				
 				c.$on('story-load', ({detail}) => {
-					console.log('story-load EVENT SUBSRIBER FIERED'+detail)
+					console.log('story-load EVENT SUBSRIBER FIERED'+JSON.stringify(detail))
 					// TODO: re-trigger load of this story
 					marker.setIcon(markerIcon('LOADED'));
+					marker.openPopup();
+
+					//const updatedPlace = await getPlace(fetch, place.wikiId)
+					//marker.setPopupContent(`<div>${JSON.stringify(updatedPlace)}</div>`)
+					loadingTimer.stop();
 				});
 				
 				return c;

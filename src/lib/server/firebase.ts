@@ -125,6 +125,10 @@ export async function savePlaceStory({wikiId, title, content}:SavePlaceStoryProp
 		if(placeDoc.exists && placeDoc.data()){
 			const data = placeDoc.data();
 
+			if(!data){
+				throw new Error("Nah3")
+			}
+
 			 const place: Place = {
 				// Map the document data to the Place interface
 				title: data.title,

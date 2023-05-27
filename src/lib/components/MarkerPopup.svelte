@@ -2,10 +2,10 @@
 	import { populateStory } from '$lib/client/wiki';
 	import type { Place } from '$lib/models/Place';
 	import { createEventDispatcher } from 'svelte';
-	import { compute_rest_props } from 'svelte/internal';
-	import { getPlaces } from '../../routes/Places.svelte';
 	const dispatch = createEventDispatcher();
-	
+	export const prerender = false;
+	export const ssr = false;
+
 	 export let place:Place
 	
 	/*function addValue(delta) {
@@ -18,6 +18,7 @@
 	async function handleStoryPopulate(wikiId:string){
 		console.log('handleStoryPopulate')
 		dispatch('loading')
+		markerState = 'loading'
 		
 		await populateStory({
 			fetch: fetch,
@@ -26,6 +27,7 @@
 			console.log('handleStoryPopulate'+JSON.stringify(story)+' Re-loading places..')
 			// TODO: this could just reload this place
 			dispatch('story-load', { story })
+			markerState = 'populated'
 			place = story.place
 			//getPlaces();
 		})
@@ -52,6 +54,10 @@
 	button {
 		width: 2rem
 	}
+
+	.leaflet-popup-close-button {
+      transform: scale(2);
+    }
 </style>
 
 <div>
@@ -63,20 +69,22 @@
 	</button>	-->
 </div>
 
-<div style="width:100%;text-align:center;font-weight:600">
+<div class="w-96 max-h-96 whitespace-normal overflow-y-auto" style="width:100%;text-align:center;font-weight:600 ">
             <div>
-            <button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" on:click={() => handleStoryPopulate(place.wikiId)}>{'Load'}</button>
-                <h1 class="text-xl font-bold underline text-center p-2">{place.title}</h1>
+
 				{#if place.content}
+					<h1 class="text-xl font-bold underline text-center p-2">{place.title}</h1>
 					<div>
 						{place.content}
 					</div>
+					<details class="max-w-96 whitespace-pre"><summary>[Generated with AI]</summary><pre> {JSON.stringify(place, undefined, 4)}</pre></details>
+
+				{:else}
+					<h1>SEED: {place.wikiTitle}</h1>
+					<details><summary></summary>{place.wikiSummary}</details>
+					<button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" on:click={() => handleStoryPopulate(place.wikiId)}>Load</button>
 				{/if}
-                <button class="float-right bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded" 
-				
-				>{'Close'}</button>
             
-            <details><summary>[Generated with AI]</summary><pre> {JSON.stringify(place, undefined, 4)}</pre></details>
 		</div>
 
 </div>
